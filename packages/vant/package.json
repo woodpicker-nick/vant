@@ -1,6 +1,6 @@
 {
   "name": "vant",
-  "version": "4.9.22",
+  "version": "4.9.22-7",
   "description": "Mobile UI Components built on Vue",
   "main": "lib/vant.cjs.js",
   "module": "es/index.mjs",
@@ -25,15 +25,6 @@
     "test:coverage": "vitest run --coverage",
     "open:coverage": "open test/coverage/lcov-report/index.html"
   },
-  "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vant-ui/vant.git",
-    "directory": "packages/vant"
-  },
-  "bugs": "https://github.com/vant-ui/vant/issues",
   "author": "chenjiahan",
   "license": "MIT",
   "keywords": [
