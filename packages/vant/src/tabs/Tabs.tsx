@@ -188,11 +188,11 @@ export default defineComponent({
         }
 
         const title = titles[state.currentIndex].$el;
-        const { lineWidth, lineHeight } = props;
+        const { lineHeight } = props;
         const left = title.offsetLeft + title.offsetWidth / 2;
 
         const lineStyle: CSSProperties = {
-          width: addUnit(lineWidth),
+          width: title.offsetWidth + 'px',
           backgroundColor: props.color,
           transform: `translateX(${left}px) translateX(-50%)`,
         };
