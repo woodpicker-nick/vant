@@ -17,85 +17,182 @@
   --van-toast-position-bottom-distance: 20%;
 }
 
-.van-toast {
+//.van-toast {
+//  display: flex;
+//  flex-direction: column;
+//  align-items: center;
+//  justify-content: center;
+//  box-sizing: content-box;
+//  transition: all var(--van-duration-fast);
+//
+//  // hack for avoid max-width when use left & fixed
+//  width: var(--van-toast-default-width);
+//  max-width: var(--van-toast-max-width);
+//  min-height: var(--van-toast-default-min-height);
+//  padding: var(--van-toast-default-padding);
+//  color: var(--van-toast-text-color);
+//  font-size: var(--van-toast-font-size);
+//  line-height: var(--van-toast-line-height);
+//
+//  // allow newline character
+//  white-space: pre-wrap;
+//  word-break: break-all;
+//  text-align: center;
+//  background: var(--van-toast-background);
+//  border-radius: var(--van-toast-radius);
+//
+//  &--break {
+//    &-normal {
+//      word-break: normal;
+//      word-wrap: normal;
+//    }
+//
+//    &-word {
+//      word-break: normal;
+//      word-wrap: break-word;
+//    }
+//  }
+//
+//  &--unclickable {
+//    // lock scroll
+//    overflow: hidden;
+//    cursor: not-allowed;
+//
+//    // should not add pointer-events: none directly to body tag
+//    // that will cause unexpected tap-highlight-color in mobile safari
+//    * {
+//      pointer-events: none;
+//    }
+//  }
+//
+//  &--text,
+//  &--html {
+//    width: fit-content;
+//    min-width: var(--van-toast-text-min-width);
+//    min-height: 0;
+//    padding: var(--van-toast-text-padding);
+//
+//    .van-toast__text {
+//      margin-top: 0;
+//    }
+//  }
+//
+//  &--top {
+//    top: var(--van-toast-position-top-distance);
+//  }
+//
+//  &--bottom {
+//    top: auto;
+//    bottom: var(--van-toast-position-bottom-distance);
+//  }
+//
+//  &__icon {
+//    font-size: var(--van-toast-icon-size);
+//  }
+//
+//  &__loading {
+//    padding: var(--van-padding-base);
+//    color: var(--van-toast-loading-icon-color);
+//  }
+//
+//  &__message {
+//    margin-top: var(--van-padding-xs);
+//  }
+//}
+
+.van-toast--loading {
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-sizing: content-box;
-  transition: all var(--van-duration-fast);
+  width: fit-content
+}
 
-  // hack for avoid max-width when use left & fixed
-  width: var(--van-toast-default-width);
-  max-width: var(--van-toast-max-width);
-  min-height: var(--van-toast-default-min-height);
-  padding: var(--van-toast-default-padding);
-  color: var(--van-toast-text-color);
-  font-size: var(--van-toast-font-size);
-  line-height: var(--van-toast-line-height);
+.van-toast--loading-icon {
+  font-size: inherit
+}
 
-  // allow newline character
+
+.van-toast {
+  transition: all .3s;
   white-space: pre-wrap;
-  word-break: break-all;
-  text-align: center;
-  background: var(--van-toast-background);
-  border-radius: var(--van-toast-radius);
+  word-break: break-word;
+  box-sizing: border-box;
+  font-size: .28rem;
+  color: #333;
+  line-height: .3rem;
+  max-width: 6.9rem;
+  min-width: 1.92rem;
+  background: transparent;
+  overflow-y: initial;
+  gap: .2rem
+}
 
-  &--break {
-    &-normal {
-      word-break: normal;
-      word-wrap: normal;
+.van-toast.van-toast--instance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff;
+  padding: .24rem .4rem;
+  border-radius: .14rem;
+  transition: .3s
+}
+
+.van-toast.van-toast--instance .van-toast__icon {
+  width: .38rem;
+  height: .38rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .42rem;
+}
+
+[dir=rtl] .van-toast.van-toast--instance .van-toast__icon {
+  margin-right: 0;
+  margin-left: .24rem
+}
+
+.van-toast.van-toast--instance .van-toast__message {
+  max-width: 5.48rem;
+  text-align: left;
+  padding-top: 2px;
+}
+
+[dir=rtl] .van-toast.van-toast--instance .van-toast__message {
+  text-align: right
+}
+
+.van-toast.van-toast--instance .van-toast__message:lang(ta) {
+  max-width: 3.48rem
+}
+
+.van-toast .van-toast--info,.van-toast .van-toast--warning,.van-toast .van-toast--error,.van-toast .van-toast--success {
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.van-toast .van-toast--success i {
+  color: #fff;
+  font-size: .32rem;
+}
+
+.van-toast .van-toast--info i {
+  color: var(--van-primary-color);
+}
+
+.van-toast .van-toast--warning i {
+  color: #ffaa09
+}
+
+.van-toast .van-toast--success {
+  background: #04be02
+}
+
+.van-toast {
+  .van-toast--error,
+  .van-toast--clear {
+    i {
+      color: #ea4e3d;
     }
-
-    &-word {
-      word-break: normal;
-      word-wrap: break-word;
-    }
-  }
-
-  &--unclickable {
-    // lock scroll
-    overflow: hidden;
-    cursor: not-allowed;
-
-    // should not add pointer-events: none directly to body tag
-    // that will cause unexpected tap-highlight-color in mobile safari
-    * {
-      pointer-events: none;
-    }
-  }
-
-  &--text,
-  &--html {
-    width: fit-content;
-    min-width: var(--van-toast-text-min-width);
-    min-height: 0;
-    padding: var(--van-toast-text-padding);
-
-    .van-toast__text {
-      margin-top: 0;
-    }
-  }
-
-  &--top {
-    top: var(--van-toast-position-top-distance);
-  }
-
-  &--bottom {
-    top: auto;
-    bottom: var(--van-toast-position-bottom-distance);
-  }
-
-  &__icon {
-    font-size: var(--van-toast-icon-size);
-  }
-
-  &__loading {
-    padding: var(--van-padding-base);
-    color: var(--van-toast-loading-icon-color);
-  }
-
-  &__text {
-    margin-top: var(--van-padding-xs);
   }
 }
+

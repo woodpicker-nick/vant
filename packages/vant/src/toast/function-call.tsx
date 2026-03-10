@@ -6,7 +6,7 @@ import type { ToastType, ToastOptions, ToastWrapperInstance } from './types';
 
 const defaultOptions: ToastOptions = {
   icon: '',
-  type: 'text',
+  type: 'info',
   message: '',
   className: '',
   overlay: false,
@@ -17,7 +17,7 @@ const defaultOptions: ToastOptions = {
   iconSize: undefined,
   iconPrefix: undefined,
   position: 'middle',
-  transition: 'van-fade',
+  transition: 'animate-zoom',
   forbidClick: false,
   loadingType: undefined,
   overlayClass: '',
@@ -128,7 +128,12 @@ export const showSuccessToast = createMethod('success');
 /**
  * Display a fail toast
  */
-export const showFailToast = createMethod('fail');
+export const showFailToast = createMethod('error');
+
+export const showErrorToast = createMethod('error');
+
+export const showWarningToast = createMethod('warning');
+
 
 /**
  * Close the currently displayed toast

@@ -2,7 +2,7 @@ import type { ComponentPublicInstance, TeleportProps } from 'vue';
 import type { LoadingType } from '../loading';
 import type { Numeric } from '../utils';
 
-export type ToastType = 'text' | 'loading' | 'success' | 'fail' | 'html';
+export type ToastType = 'text' | 'loading' | 'success' | 'error' | 'info' | 'warning' | 'html';
 export type ToastPosition = 'top' | 'middle' | 'bottom';
 export type ToastWordBreak = 'break-all' | 'break-word' | 'normal';
 

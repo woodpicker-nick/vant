@@ -66,6 +66,11 @@ function convertVh(value: string) {
   return (+value * windowHeight.value) / 100;
 }
 
+const numberToRem = (e: any, t?: number) => (
+  (t = t || 100),
+  `${(typeof e == 'string' ? parseFloat(e) : e) / t}rem`
+);
+
 export function unitToPx(value: Numeric): number {
   if (typeof value === 'number') {
     return value;
@@ -86,6 +91,11 @@ export function unitToPx(value: Numeric): number {
   return parseFloat(value);
 }
 
+
+export function convertToPx (e: any) {
+  const t = typeof e == "string" ? parseFloat(e) : e;
+  return unitToPx(numberToRem(t));
+}
 const camelizeRE = /-(\w)/g;
 
 export const camelize = (str: string): string =>

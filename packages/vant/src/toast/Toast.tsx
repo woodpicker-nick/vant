@@ -43,19 +43,17 @@ const popupInheritProps = [
 ] as const;
 
 export const toastProps = {
-  icon: String,
   show: Boolean,
-  type: makeStringProp<ToastType>('text'),
+  type: makeStringProp<ToastType>('info'),
   overlay: Boolean,
-  message: numericProp,
   iconSize: numericProp,
   duration: makeNumberProp(2000),
   position: makeStringProp<ToastPosition>('middle'),
-  teleport: [String, Object] as PropType<TeleportProps['to']>,
+  teleport: [String, Element, Boolean] as PropType<TeleportProps['to']>,
   wordBreak: String as PropType<ToastWordBreak>,
   className: unknownProp,
   iconPrefix: String,
-  transition: makeStringProp('van-fade'),
+  transition: makeStringProp('animate-zoom'), //van-fade
   loadingType: String as PropType<LoadingType>,
   forbidClick: Boolean,
   overlayClass: unknownProp,
@@ -63,6 +61,17 @@ export const toastProps = {
   closeOnClick: Boolean,
   closeOnClickOverlay: Boolean,
   zIndex: numericProp,
+  icon: {
+    type: [Object, Function],
+  },
+  loadingColor: {
+    type: String,
+    required: false,
+  },
+  message: {
+    type: [String, Object, Function],
+    default: '',
+  },
 };
 
 export type ToastProps = ExtractPropTypes<typeof toastProps>;
@@ -79,7 +88,7 @@ export default defineComponent({
     let clickable = false;
 
     const toggleClickable = () => {
-      const newValue = props.show && props.forbidClick;
+      const newValue = props.show && props.overlay;
       if (clickable !== newValue) {
         clickable = newValue;
         lockClick(clickable);
@@ -88,53 +97,85 @@ export default defineComponent({
 
     const updateShow = (show: boolean) => emit('update:show', show);
 
-    const onClick = () => {
-      if (props.closeOnClick) {
-        updateShow(false);
-      }
-    };
+    // const onClick = () => {
+    //   if (props.closeOnClick) {
+    //     updateShow(false);
+    //   }
+    // };
 
     const clearTimer = () => clearTimeout(timer);
 
     const renderIcon = () => {
-      const { icon, type, iconSize, iconPrefix, loadingType } = props;
-      const hasIcon = icon || type === 'success' || type === 'fail';
+      const { type, icon, iconSize, iconPrefix, loadingType } = props;
+      let iconName = undefined;
+      if (!!icon) {
+        if (typeof icon == 'function') {
+          return icon();
+        } else {
+          iconName = String(icon);
+        }
+      } else {
+        if(type === 'info' ||
+          type === 'warning' ||
+          type === 'success' ||
+          type === 'error') {
+          iconName = type === 'error' ? 'clear' : type;
+        }
+      }
 
-      if (hasIcon) {
+      if (!!iconName) {
         return (
-          <Icon
-            name={icon || type}
-            size={iconSize}
-            class={bem('icon')}
-            classPrefix={iconPrefix}
-          />
+          <div class={[bem('icon'), bem(undefined, iconName, true)]}>
+            <Icon
+              name={iconName}
+              size={iconSize}
+              classPrefix={iconPrefix}
+            />
+          </div>
         );
       }
 
       if (type === 'loading') {
         return (
-          <Loading class={bem('loading')} size={iconSize} type={loadingType} />
+          <div class={[bem('icon'), bem(undefined, 'loading', true)]}>
+            <Loading size={iconSize} type={loadingType} />
+          </div>
         );
       }
+      // if (!!icon)
+      //   return typeof icon == "function" ? (icon as Function)() : icon;
+      // if (u === 'success' || u === 'info' || u === 'warn' || u === 'error')
+      // return <Icon
+      //   name={u}
+      //   class={[bem('icon'), bem(u)]}
+      //   //classPrefix={iconPrefix}
+      // />;
+      // if (u === 'loading')
+      //   return <Loading class={bem('loading')} type={loadingType} />;
+      // return v("div", {
+      //   class: [cs("toast--icon"), cs("toast--loading")]
+      // }, [v(aO, {
+      //   color: props.loadingColor
+      // }, null)])
     };
 
     const renderMessage = () => {
       const { type, message } = props;
 
       if (slots.message) {
-        return <div class={bem('text')}>{slots.message()}</div>;
+        return <div class={bem('message')}>{slots.message()}</div>;
       }
 
       if (isDef(message) && message !== '') {
         return type === 'html' ? (
-          <div key={0} class={bem('text')} innerHTML={String(message)} />
+          <div key={0} class={bem('message')} innerHTML={String(message)} />
         ) : (
-          <div class={bem('text')}>{message}</div>
+          <div class={bem('message')}>{message}</div>
         );
       }
     };
 
-    watch(() => [props.show, props.forbidClick], toggleClickable);
+    watch(() => [props.show, props.overlay], toggleClickable);
 
     watch(
       () => [props.show, props.type, props.message, props.duration],
@@ -162,13 +203,15 @@ export default defineComponent({
           props.className,
         ]}
         lockScroll={false}
-        onClick={onClick}
+        // onClick={onClick}
         onClosed={clearTimer}
         onUpdate:show={updateShow}
         {...pick(props, popupInheritProps)}
       >
-        {renderIcon()}
-        {renderMessage()}
+        <div class={bem(['instance'])}>
+          {renderIcon()}
+          {renderMessage()}
+        </div>
       </Popup>
     );
   },

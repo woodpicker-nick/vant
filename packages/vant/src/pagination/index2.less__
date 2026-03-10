@@ -7,19 +7,14 @@
   --van-pagination-item-disabled-color: var(--van-gray-7);
   --van-pagination-item-disabled-background: var(--van-background);
   --van-pagination-background: var(--van-background-2);
-  --van-pagination-border-color: var(---van-border-color);
-  --van-pagination-border-radius: 10px;
   --van-pagination-desc-color: var(--van-gray-7);
   --van-pagination-disabled-opacity: var(--van-disabled-opacity);
 }
 
 .van-pagination {
   font-size: var(--van-pagination-font-size);
-  display: flex;
-  align-items: center;
 
   &__items {
-    flex: 1;
     display: flex;
   }
 
@@ -28,39 +23,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: var(--van-pagination-border-radius);
-  }
-
-  &__button {
-    flex: 1;
-    box-sizing: border-box;
-    color: var(--van-pagination-item-default-color);
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    height: .5rem;
-
-    > button {
-      width: .5rem;
-      height: .5rem;
-      margin: 0 auto;
-      border: 0.02rem solid var(--van-pagination-border-color);
-      background: var(--van-pagination-background);
-      border-radius: var(--van-pagination-border-radius);
-    }
-  }
-
-  &__icon {
-    color: var(--van-pagination-item-default-color);
-    transform: rotate(180deg);
-    &--disabled {
-      color: var(--van-pagination-item-disabled-color);
-    }
-    &--next-icon {
-      transform: rotate(0);
-    }
   }
 
   &__item {
@@ -72,9 +34,7 @@
     background: var(--van-pagination-background);
     cursor: pointer;
     user-select: none;
-    border: 0.02rem solid var(--van-pagination-border-color);
-    margin: 0 .075rem;
-    font-weight: 400;
+
     button {
       flex: 1;
       height: 100%;
@@ -99,11 +59,6 @@
     &--active {
       color: var(--van-white);
       background-color: var(--van-pagination-item-default-color);
-      border: none;
-
-      > button {
-        color: var(--van-pagination-item-disabled-color);
-      }
     }
 
     &--page {
@@ -112,6 +67,7 @@
 
     &--prev,
     &--next {
+      padding: 0 var(--van-padding-base);
       cursor: pointer;
     }
 
@@ -125,16 +81,6 @@
         color: var(--van-pagination-item-disabled-color);
         background-color: var(--van-pagination-item-disabled-background);
         opacity: var(--van-pagination-disabled-opacity);
-      }
-    }
-
-    &--ellipsis-no-border {
-      border: none;
-      background: transparent;
-
-      &:active {
-        color: var(--van-pagination-item-disabled-color);
-        background: transparent;
       }
     }
   }

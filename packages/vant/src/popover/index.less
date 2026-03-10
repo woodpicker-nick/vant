@@ -15,6 +15,8 @@
   --van-popover-dark-text-color: var(--van-white);
   --van-popover-dark-background: #4a4a4a;
   --van-popover-dark-action-disabled-text-color: var(--van-text-color-2);
+  --van-popover-arrow--background: #4a4a4a;
+  --van-popover-arrow--border-color: #4a4a4a;
 }
 
 .van-popover {
@@ -31,16 +33,52 @@
 
   &__arrow {
     position: absolute;
-    width: 0;
-    height: 0;
-    border-color: transparent;
-    border-style: solid;
-    border-width: var(--van-popover-arrow-size);
+    z-index: 1;
+    display: block;
+    pointer-events: none;
+    width: 16px;
+    height: 16px;
+    overflow: hidden;
+  }
+
+  &__arrow::before {
+    position: absolute;
+    bottom: 0;
+    inset-inline-start: 0;
+    width: 16px;
+    height: 8px;
+    background: var(--van-popover-arrow--background);
+    clip-path: polygon(1.6568542494923806px 100%, 50% 1.6568542494923806px, 14.34314575050762px 100%, 1.6568542494923806px 100%);
+    clip-path: path('M 0 8 A 4 4 0 0 0 2.82842712474619 6.82842712474619 L 6.585786437626905 3.0710678118654755 A 2 2 0 0 1 9.414213562373096 3.0710678118654755 L 13.17157287525381 6.82842712474619 A 4 4 0 0 0 16 8 Z');
+    content: "";
+  }
+
+  &__arrow::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    inset-inline: 0;
+    margin: auto;
+    border-radius: 0 0 2px 0;
+    transform: translateY(50%) rotate(-135deg);
+    box-shadow: 3px 3px 7px rgba(0, 0, 0, 0.1);
+    z-index: 0;
+    background: var(--van-popover-arrow--background);
+    border: .02rem solid var(--van-popover-arrow--border-color);
+    width: .18rem;
+    height: .18rem;
+  }
+
+  &__arrow-content {
   }
 
   &__content {
     overflow: hidden;
     border-radius: var(--van-popover-radius);
+    padding: .1rem;
+    background: var(--van-popover-arrow--background);
+    line-height: 1.1;
+    border: .02rem solid var(--van-popover-arrow--border-color);
 
     &--horizontal {
       display: flex;
@@ -104,10 +142,9 @@
 
   &[data-popper-placement^='top'] {
     .van-popover__arrow {
-      bottom: 0;
-      border-top-color: currentColor;
-      border-bottom-width: 0;
-      margin-bottom: calc(var(--van-popover-arrow-size) * -1);
+      bottom: .03rem;
+      width: .26rem;
+      height: .26rem;
     }
   }
 
@@ -116,7 +153,7 @@
 
     .van-popover__arrow {
       left: 50%;
-      transform: translateX(-50%);
+      transform: translateX(-50%) translateY(100%) rotate(180deg);
     }
   }
 
@@ -139,9 +176,6 @@
   &[data-popper-placement^='left'] {
     .van-popover__arrow {
       right: 0;
-      border-right-width: 0;
-      border-left-color: currentColor;
-      margin-right: calc(var(--van-popover-arrow-size) * -1);
     }
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "vant",
-  "version": "4.9.22-8",
+  "version": "4.9.22-42",
   "description": "Mobile UI Components built on Vue",
   "main": "lib/vant.cjs.js",
   "module": "es/index.mjs",
@@ -39,12 +39,20 @@
   "dependencies": {
     "@vant/popperjs": "workspace:^",
     "@vant/use": "workspace:^",
-    "@vue/shared": "^3.5.26"
+    "@vue/shared": "^3.5.26",
+    "@vueuse/core": "^14.2.1",
+    "lodash-es": "^4.17.23",
+    "vue-dragscroll": "^4.0.6",
+    "vue": "^3.0.0"
   },
   "peerDependencies": {
+    "@vueuse/core": "^14.2.1",
+    "lodash-es": "^4.17.23",
+    "vue-dragscroll": "^4.0.6",
     "vue": "^3.0.0"
   },
   "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "^24.10.9",
     "@vant/area-data": "workspace:*",
     "@vant/cli": "workspace:*",

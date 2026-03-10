@@ -89,6 +89,8 @@ function getAPIMap() {
       'showFailToast',
       'showLoadingToast',
       'showSuccessToast',
+      'showErrorToast',
+      'showWarningToast',
       'allowMultipleToast',
       'setToastDefaultOptions',
       'resetToastDefaultOptions',

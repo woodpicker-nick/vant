@@ -11,7 +11,7 @@ import {
   type TeleportProps,
   type ExtractPropTypes,
 } from 'vue';
-import { Instance, createPopper, offsetModifier } from '@vant/popperjs';
+import { Instance, Modifier, createPopper, offsetModifier } from '@vant/popperjs';
 
 // Utils
 import {
@@ -63,6 +63,7 @@ export const popoverProps = {
   theme: makeStringProp<PopoverTheme>('light'),
   overlay: Boolean,
   actions: makeArrayProp<PopoverAction>(),
+  transition: makeStringProp('van-popover-zoom'),
   actionsDirection: makeStringProp<PopoverActionsDirection>('vertical'),
   trigger: makeStringProp<PopoverTrigger>('click'),
   duration: numericProp,
@@ -117,10 +118,22 @@ export default defineComponent({
         },
         extend({}, offsetModifier, {
           options: {
-            offset: props.offset,
+            offset: [0, 7],
           },
         }),
-      ],
+        {
+          name: "clampLeftToZero",
+          enabled: true,
+          phase: "main",
+          requires: ["popperOffsets"],
+          fn({ state } : { state : any }) {
+            const offsets = state.modifiersData.popperOffsets;
+            if (!offsets) return;
+
+            if (offsets.x < 0) offsets.x = 0;
+          },
+        }
+      ] as Array<Partial<Modifier<any, any>>>,
     });
 
     const createPopperInstance = () => {
@@ -262,14 +275,14 @@ export default defineComponent({
           show={show.value}
           class={bem([props.theme])}
           position={''}
-          transition="van-popover-zoom"
+          transition={props.transition}
           lockScroll={false}
           onUpdate:show={updateShow}
           {...attrs}
           {...useScopeId()}
           {...pick(props, popupProps)}
         >
-          {props.showArrow && <div class={bem('arrow')} />}
+          {props.showArrow && <div class={bem('arrow')}><span class={bem('arrow-content')}></span></div>}
           <div role="menu" class={bem('content', props.actionsDirection)}>
             {slots.default ? slots.default() : props.actions.map(renderAction)}
           </div>

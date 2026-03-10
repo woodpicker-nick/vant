@@ -15,9 +15,7 @@ import {
   type Numeric,
 } from '../utils';
 
-const [name, bem] = createNamespace('pagination');
-
-import Icon from '../icon';
+const [name, bem, t] = createNamespace('pagination');
 
 type PageItem = {
   text: Numeric;
@@ -45,8 +43,6 @@ export const paginationProps = {
   forceEllipses: Boolean,
   showPrevButton: truthProp,
   showNextButton: truthProp,
-  arrivedHidden: truthProp,
-  hideEllipsisBorder: Boolean
 };
 
 export type PaginationProps = ExtractPropTypes<typeof paginationProps>;
@@ -135,16 +131,18 @@ export default defineComponent({
     );
 
     const renderPrevButton = () => {
-      const { mode, modelValue, showPrevButton, arrivedHidden } = props;
-      const disabled = modelValue === 1;
-      if (!showPrevButton || (arrivedHidden && disabled)) {
+      const { mode, modelValue, showPrevButton } = props;
+
+      if (!showPrevButton) {
         return;
       }
+
       const slot = slots['prev-text'];
+      const disabled = modelValue === 1;
       return (
-        <div
+        <li
           class={[
-            bem('button', { disabled, border: mode === 'simple', prev: true }),
+            bem('item', { disabled, border: mode === 'simple', prev: true }),
             BORDER_SURROUND,
           ]}
         >
@@ -153,32 +151,25 @@ export default defineComponent({
             disabled={disabled}
             onClick={() => updateModelValue(modelValue - 1, true)}
           >
-            {slot ? (
-              slot()
-            ) : (
-              <Icon
-                name="arrow-left"
-                class={disabled? bem("icon-disabled") : null}
-              />
-            )}
+            {slot ? slot() : props.prevText || t('prev')}
           </button>
-        </div>
+        </li>
       );
     };
 
     const renderNextButton = () => {
-      const { mode, modelValue, showNextButton, arrivedHidden } = props;
-      const disabled = modelValue === count.value;
+      const { mode, modelValue, showNextButton } = props;
 
-      if (!showNextButton || (arrivedHidden && disabled)) {
+      if (!showNextButton) {
         return;
       }
 
       const slot = slots['next-text'];
+      const disabled = modelValue === count.value;
       return (
-        <div
+        <li
           class={[
-            bem('button', { disabled, border: mode === 'simple', next: true }),
+            bem('item', { disabled, border: mode === 'simple', next: true }),
             BORDER_SURROUND,
           ]}
         >
@@ -187,16 +178,9 @@ export default defineComponent({
             disabled={disabled}
             onClick={() => updateModelValue(modelValue + 1, true)}
           >
-            {slot ? (
-              slot()
-            ) : (
-              <Icon
-                name="arrow"
-                class={disabled? bem("icon-disabled") : null}
-              />
-            )}
+            {slot ? slot() : props.nextText || t('next')}
           </button>
-        </div>
+        </li>
       );
     };
 
@@ -204,28 +188,28 @@ export default defineComponent({
       pages.value.map((page) => (
         <li
           class={[
-            bem('item', { active: page.active, page: true, "ellipsis-no-border" : page.text === "···" && props.hideEllipsisBorder }),
+            bem('item', { active: page.active, page: true }),
             BORDER_SURROUND,
           ]}
-          onClick={() => updateModelValue(page.number, true)}
         >
-          <div
+          <button
+            type="button"
             aria-current={page.active || undefined}
+            onClick={() => updateModelValue(page.number, true)}
           >
             {slots.page ? slots.page(page) : page.text}
-          </div>
+          </button>
         </li>
       ));
 
     return () => (
       <nav role="navigation" class={bem()}>
-        {renderPrevButton()}
         <ul class={bem('items')}>
+          {renderPrevButton()}
           {props.mode === 'simple' ? renderDesc() : renderPages()}
+          {renderNextButton()}
         </ul>
-        {renderNextButton()}
       </nav>
     );
   },
 });
-

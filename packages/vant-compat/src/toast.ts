@@ -4,6 +4,8 @@ import {
   showFailToast,
   showSuccessToast,
   showLoadingToast,
+  showErrorToast,
+  showWarningToast,
   allowMultipleToast,
   setToastDefaultOptions,
   resetToastDefaultOptions,
@@ -36,6 +38,22 @@ Toast.success = (...args: Parameters<typeof showSuccessToast>) => {
 
 Toast.loading = (...args: Parameters<typeof showLoadingToast>) => {
   const toast = showLoadingToast(...args);
+  return {
+    clear: toast.close,
+    ...toast,
+  }
+}
+
+Toast.warning = (...args: Parameters<typeof showWarningToast>) => {
+  const toast = showWarningToast(...args);
+  return {
+    clear: toast.close,
+    ...toast,
+  }
+}
+
+Toast.error = (...args: Parameters<typeof showErrorToast>) => {
+  const toast = showErrorToast(...args);
   return {
     clear: toast.close,
     ...toast,

@@ -76,6 +76,32 @@
   }
 }
 
+@keyframes zoomIn {
+  0% {
+    transform: scale3d(.3, .3, .3);
+    opacity: 0
+  }
+
+  50% {
+    opacity: 1
+  }
+}
+
+@keyframes zoomOut {
+  0% {
+    opacity: 1
+  }
+
+  50% {
+    transform: scale3d(.3, .3, .3);
+    opacity: 0
+  }
+
+  to {
+    opacity: 0
+  }
+}
+
 .van-fade {
   &-enter-active {
     animation: var(--van-duration-base) van-fade-in both var(--van-ease-out);
@@ -88,48 +114,58 @@
 
 .van-slide-up {
   &-enter-active {
-    animation: van-slide-up-enter var(--van-duration-base) both
-      var(--van-ease-out);
+    animation: van-slide-up-enter var(--van-duration-base) both var(--van-ease-out);
   }
 
   &-leave-active {
-    animation: van-slide-up-leave var(--van-duration-base) both
-      var(--van-ease-in);
+    animation: van-slide-up-leave var(--van-duration-base) both var(--van-ease-in);
   }
 }
 
 .van-slide-down {
   &-enter-active {
-    animation: van-slide-down-enter var(--van-duration-base) both
-      var(--van-ease-out);
+    animation: van-slide-down-enter var(--van-duration-base) both var(--van-ease-out);
   }
 
   &-leave-active {
-    animation: van-slide-down-leave var(--van-duration-base) both
-      var(--van-ease-in);
+    animation: van-slide-down-leave var(--van-duration-base) both var(--van-ease-in);
   }
 }
 
 .van-slide-left {
   &-enter-active {
-    animation: van-slide-left-enter var(--van-duration-base) both
-      var(--van-ease-out);
+    animation: van-slide-left-enter var(--van-duration-base) both var(--van-ease-out);
   }
 
   &-leave-active {
-    animation: van-slide-left-leave var(--van-duration-base) both
-      var(--van-ease-in);
+    animation: van-slide-left-leave var(--van-duration-base) both var(--van-ease-in);
   }
 }
 
 .van-slide-right {
   &-enter-active {
-    animation: van-slide-right-enter var(--van-duration-base) both
-      var(--van-ease-out);
+    animation: van-slide-right-enter var(--van-duration-base) both var(--van-ease-out);
   }
 
   &-leave-active {
-    animation: van-slide-right-leave var(--van-duration-base) both
-      var(--van-ease-in);
+    animation: van-slide-right-leave var(--van-duration-base) both var(--van-ease-in);
+  }
+}
+
+.animate__zoomIn {
+  animation-name: zoomIn
+}
+
+.animate__zoomOut {
+  animation-name: zoomOut
+}
+
+.animate-zoom {
+  &-enter-active {
+    animation: var(--van-duration-base) zoomIn both
+  }
+
+  &-leave-active {
+    animation: var(--van-duration-base) zoomOut both
   }
 }

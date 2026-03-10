@@ -10,6 +10,8 @@ export {
   showFailToast,
   showLoadingToast,
   showSuccessToast,
+  showWarningToast,
+  showErrorToast,
   allowMultipleToast,
   setToastDefaultOptions,
   resetToastDefaultOptions,
