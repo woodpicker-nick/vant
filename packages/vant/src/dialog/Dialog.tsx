@@ -35,6 +35,7 @@ import { ActionBarButton } from '../action-bar-button';
 // Types
 import type {
   DialogTheme,
+  DialogCustomStyle,
   DialogAction,
   DialogMessage,
   DialogMessageAlign,
@@ -64,6 +65,10 @@ export const dialogProps = extend({}, popupSharedProps, {
   closeOnClickOverlay: Boolean,
   keyboardEnabled: truthProp,
   destroyOnClose: Boolean,
+  showClose: truthProp,
+  customClose: {
+    type: String as PropType<DialogCustomStyle> | undefined,
+  },
 });
 
 export type DialogProps = ExtractPropTypes<typeof dialogProps>;
@@ -80,13 +85,14 @@ export default defineComponent({
 
   props: dialogProps,
 
-  emits: ['confirm', 'cancel', 'keydown', 'update:show'],
+  emits: ['confirm', 'cancel', 'close', 'keydown', 'update:show'],
 
   setup(props, { emit, slots }) {
     const root = ref<ComponentInstance>();
     const loading = reactive({
       confirm: false,
       cancel: false,
+      close: false
     });
 
     const updateShow = (value: boolean) => emit('update:show', value);
@@ -121,6 +127,8 @@ export default defineComponent({
       }
     };
 
+    const onClose = getActionHandler('close');
+
     const onCancel = getActionHandler('cancel');
     const onConfirm = getActionHandler('confirm');
     const onKeydown = withKeys(
@@ -149,7 +157,7 @@ export default defineComponent({
       if (title) {
         return (
           <div
-            class={bem('header', {
+            class={props.customClose ? bem('main', 'header', true) : bem('header', {
               isolated: !props.message && !slots.default,
             })}
           >
@@ -177,7 +185,7 @@ export default defineComponent({
 
     const renderContent = () => {
       if (slots.default) {
-        return <div class={bem('content')}>{slots.default()}</div>;
+        return <div class={props.customClose ? bem('main', 'content', true) : bem('content')}>{slots.default()}</div>;
       }
 
       const { title, message, allowHtml } = props;
@@ -188,7 +196,7 @@ export default defineComponent({
             // add key to force re-render
             // see: https://github.com/vant-ui/vant/issues/7963
             key={allowHtml ? 1 : 0}
-            class={bem('content', { isolated: !hasTitle })}
+            class={props.customClose ? bem('main', 'content', true) : bem('content', { isolated: !hasTitle })}
           >
             {renderMessage(hasTitle)}
           </div>
@@ -252,15 +260,45 @@ export default defineComponent({
 
     const renderFooter = () => {
       if (slots.footer) {
-        return slots.footer();
+        return <div class={bem('footer')}>{slots.footer()}</div>;
       }
       return props.theme === 'round-button'
         ? renderRoundButtons()
         : renderButtons();
     };
 
+    const renderCustomCloseBox = () => {
+      if (props.customClose === '1') {
+        return (
+          <div class={bem('close-box', 'occupy-space')}>
+            <div>
+              <i
+                class={bem("close-box-icon")}
+                style="display: inline-flex; justify-content: center; align-items: center;"
+                onClick={onClose}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 82 82"
+                  width="1em"
+                  height="1em"
+                  fill="currentColor"
+                >
+                  <path d="M0,41A41,41,0,1,1,41,82,41,41,0,0,1,0,41Zm6,0A35,35,0,1,0,41,6,35.039,35.039,0,0,0,6,41ZM51.879,56.121,41,45.243,30.121,56.121a3,3,0,1,1-4.243-4.243L36.757,41,25.879,30.121a3,3,0,1,1,4.243-4.243L41,36.757,51.879,25.879a3,3,0,1,1,4.243,4.243L45.243,41,56.121,51.879a3,3,0,0,1-4.243,4.243Z"></path>
+                </svg>
+              </i>
+            </div>
+          </div>
+        );
+      } else {
+        if (slots.close) {
+          return slots.close();
+        }
+      }
+    };
+
     return () => {
-      const { width, title, theme, message, className } = props;
+      const { width, title, theme, message, className, customClose, showClose } = props;
       return (
         <Popup
           ref={root}
@@ -273,9 +311,21 @@ export default defineComponent({
           onUpdate:show={updateShow}
           {...pick(props, popupInheritKeys)}
         >
-          {renderTitle()}
-          {renderContent()}
-          {renderFooter()}
+          {customClose ? (
+            <>
+              <div class={bem('main')}>
+                {renderTitle()}
+                {renderContent()}
+              </div>
+              {showClose && renderCustomCloseBox()}
+            </>
+          ) : (
+            <>
+              {renderTitle()}
+              {renderContent()}
+              {showClose &&  renderFooter()}
+            </>
+          )}
         </Popup>
       );
     };

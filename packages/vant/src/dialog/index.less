@@ -24,7 +24,7 @@
 .van-dialog {
   top: 45%;
   width: var(--van-dialog-width);
-  overflow: hidden;
+  overflow-y: visible;
   font-size: var(--van-dialog-font-size);
   background: var(--van-dialog-background);
   border-radius: var(--van-dialog-radius);
@@ -35,6 +35,70 @@
   @media (max-width: 321px) {
     width: var(--van-dialog-small-screen-width);
   }
+
+  &__main {
+    width: 100%;
+    background: var(--van-dialog-background);
+    border-radius: .2rem;
+    backface-visibility: hidden;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    &--header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: .3rem;
+      font-weight: 400;
+      font-stretch: normal;
+      font-style: normal;
+      letter-spacing: normal;
+      color: var(--van-text-color);
+      padding: .2rem .3rem .3rem;
+      box-sizing: border-box;
+    }
+
+    &--content {
+      flex: 1;
+      padding: 0 .3rem .2rem;
+      box-sizing: border-box;
+      min-height: .92rem;
+      color: var(--van-text-color);
+    }
+  }
+
+  &__close-box {
+    position: absolute;
+    width: 100%;
+    bottom: -1rem;
+
+    >div {
+      padding-top: 0;
+      width: 100%;
+      position: absolute;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    &--occupy-space {
+      >div {
+        position: relative;
+      }
+    }
+
+    &-icon {
+      font-size: .6rem;
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+
+
 
   &__header {
     color: var(--van-text-color);

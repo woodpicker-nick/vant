@@ -118,7 +118,7 @@ export default defineComponent({
         },
         extend({}, offsetModifier, {
           options: {
-            offset: [0, 7],
+            offset: props.offset,
           },
         }),
         {

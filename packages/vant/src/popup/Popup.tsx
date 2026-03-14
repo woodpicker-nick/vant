@@ -23,6 +23,7 @@ import {
   callInterceptor,
   createNamespace,
   HAPTICS_FEEDBACK,
+  makeNumericProp,
 } from '../utils';
 
 // Composables
@@ -150,12 +151,16 @@ export default defineComponent({
 
         return (
           <Overlay
-            v-slots={{ default: slots['overlay-content'] }}
             {...overlayProps}
             {...useScopeId()}
             onClick={onClickOverlay}
-          />
+            {...{ style: attrs.style }}
+          >
+            {renderTransition()}
+          </Overlay>
         );
+      } else {
+        return renderTransition();
       }
     };
 
@@ -201,6 +206,7 @@ export default defineComponent({
         safeAreaInsetTop,
         safeAreaInsetBottom,
         show,
+        overlay,
       } = props;
 
       if (!show && destroyOnClose) {
@@ -222,11 +228,13 @@ export default defineComponent({
             {
               'van-safe-area-top': safeAreaInsetTop,
               'van-safe-area-bottom': safeAreaInsetBottom,
-            },
+            },  attrs.class
           ]}
           onKeydown={onKeydown}
-          {...attrs}
           {...useScopeId()}
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
         >
           {slots.default?.()}
           {renderCloseIcon()}
@@ -305,20 +313,10 @@ export default defineComponent({
 
     return () => {
       if (props.teleport) {
-        return (
-          <Teleport to={props.teleport}>
-            {renderOverlay()}
-            {renderTransition()}
-          </Teleport>
-        );
+        return <Teleport to={props.teleport}>{renderOverlay()}</Teleport>;
       }
 
-      return (
-        <>
-          {renderOverlay()}
-          {renderTransition()}
-        </>
-      );
+      return <>{renderOverlay()}</>;
     };
   },
 });
