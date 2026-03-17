@@ -203,6 +203,7 @@ export default defineComponent({
           props.className,
         ]}
         lockScroll={false}
+        destroyOnClose
         // onClick={onClick}
         onClosed={clearTimer}
         onUpdate:show={updateShow}

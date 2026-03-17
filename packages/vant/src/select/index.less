@@ -1,0 +1,123 @@
+:root,
+:host {
+  --van-select-border-color: var(--van-border-color);
+  --van-select-color: var(--van-text-color);
+  --van-select-focus-widthin-border-color: var(--van-primary-color);
+  --van-select-reference-border-color: var(--van-primary-color);
+  --van-select-not-found-color: var(--van-gray-6);
+  --van-select-options-background: var(--van-background);
+}
+
+.van-select__reference {
+  position: relative;
+  min-width: 1.6rem;
+  max-width: 100%;
+  overflow: hidden;
+  width: auto;
+  border-radius: .1rem;
+  border: var(--van-border-width) solid var(--van-select-border-color);
+  color: var(--van-select-color);
+  cursor: pointer
+}
+
+.van-select__reference:focus-within {
+  border-color: var(--van-select-focus-widthin-border-color)
+}
+
+.van-select__reference--mini {
+  height: .5rem;
+  min-width: 1.6rem;
+  font-size: .2rem
+}
+
+.van-select__reference--middle {
+  height: .6rem;
+  min-width: 2.4rem;
+  font-size: .2rem
+}
+
+.van-select__reference--large {
+  font-size: .22rem;
+  height: .7rem;
+  min-width: 100%
+}
+
+.van-select__reference--round {
+  border-radius: .35rem
+}
+
+.van-select__reference--border {
+  border-color: var(--van-select-reference-border-color)
+}
+
+.van-select__icon-clear {
+  z-index: 5;
+  font-size: .28rem;
+  margin-right: .05rem
+}
+
+[dir=rtl] .van-select__icon-clear {
+  margin-right: 0;
+  margin-left: .05rem
+}
+
+.van-select__icon-arrow {
+  font-size: .2rem
+}
+
+.van-select__icon--arrowTop {
+  transition: transform .3s linear;
+  transform: rotate(90deg);
+  margin-right: .06rem
+}
+
+[dir=rtl] .van-select__icon--arrowTop {
+  transform: rotate(-90deg);
+  margin-right: 0;
+  margin-left: .06rem
+}
+
+.van-select__icon--arrowBottom {
+  transition: transform .3s linear;
+  transform: rotate(-90deg);
+  margin-right: .06rem
+}
+
+[dir=rtl] .van-select__icon--arrowBottom {
+  transform: rotate(90deg);
+  margin-right: 0;
+  margin-left: .06rem
+}
+
+.van-select__options {
+  padding: .15rem .03rem;
+  box-sizing: border-box;
+  max-height: 5.7rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  background: var(--van-select-options-background);
+  border: solid var(--van-border-width) var(--van-border-color);
+  box-shadow: 0 .04rem .12rem rgba(0,0,0,.1);
+  border-radius: .14rem
+}
+
+.van-select__scroll {
+  flex: 1
+}
+
+.van-select__not-found {
+  height: .8rem;
+  min-width: 1.6rem;
+  width: 100%;
+  line-height: .8rem;
+  padding-left: .17rem;
+  color: var(--van-select-not-found-color)
+}
+
+[dir=rtl] .van-select__not-found {
+  padding-left: 0;
+  padding-right: .17rem
+}

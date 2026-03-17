@@ -1,4 +1,5 @@
 import type { ComponentPublicInstance } from 'vue';
+import { isVNode } from 'vue';
 
 export function noop() {}
 
@@ -16,6 +17,13 @@ export const isObject = (val: unknown): val is Record<any, any> =>
 
 export const isDef = <T>(val: T): val is NonNullable<T> =>
   val !== undefined && val !== null;
+
+export const isNull = (val: any) => val == null;
+
+
+export function isNotVueObject(e: any) {
+  return typeof e == "function" || Object.prototype.toString.call(e) === "[object Object]" && !isVNode(e)
+}
 
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const isFunction = (val: unknown): val is Function =>
@@ -48,7 +56,7 @@ export function get(object: any, path: string): any {
   let result = object;
 
   keys.forEach((key) => {
-    result = isObject(result) ? result[key] ?? '' : '';
+    result = isObject(result) ? (result[key] ?? '') : '';
   });
 
   return result;
@@ -84,3 +92,19 @@ export const toArray = <T>(item: T | T[]): T[] =>
 
 export const flat = <T>(arr: Array<T | T[]>) =>
   arr.reduce<T[]>((acc, val) => acc.concat(val), []);
+
+export const getTextWidthScore = (str: any) => {
+  let len = 0;
+
+  if (!str) return 0;
+
+  for (let i = 0; i < str.length; i++) {
+    if (str.charCodeAt(i) > 255) {
+      len += 1;
+    } else {
+      len += 0.5;
+    }
+  }
+
+  return len;
+};

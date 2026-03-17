@@ -1,6 +1,8 @@
 :root,
 :host {
   --van-dialog-width: 320px;
+  --van-dialog-min-width: 320px;
+  --van-dialog-max-width: 450px;
   --van-dialog-small-screen-width: 90%;
   --van-dialog-font-size: var(--van-font-size-lg);
   --van-dialog-transition: var(--van-duration-base);
@@ -22,8 +24,8 @@
 }
 
 .van-dialog {
-  top: 45%;
-  width: var(--van-dialog-width);
+  min-width: var(--van-dialog-min-width);
+  max-width: var(--van-dialog-max-width);
   overflow-y: visible;
   font-size: var(--van-dialog-font-size);
   background: var(--van-dialog-background);
@@ -31,6 +33,9 @@
   backface-visibility: hidden; // avoid blurry text after scale animation
   transition: var(--van-dialog-transition);
   transition-property: transform, opacity;
+  transform-origin: center center;
+  background-color: transparent;
+  max-height: 100vh;
 
   @media (max-width: 321px) {
     width: var(--van-dialog-small-screen-width);
@@ -51,7 +56,7 @@
       align-items: center;
       justify-content: center;
       text-align: center;
-      font-size: .3rem;
+      font-size: 15px;
       font-weight: 400;
       font-stretch: normal;
       font-style: normal;
@@ -63,20 +68,19 @@
 
     &--content {
       flex: 1;
-      padding: 0 .3rem .2rem;
+      padding: 15px;
       box-sizing: border-box;
-      min-height: .92rem;
+      min-height: 45px;
       color: var(--van-text-color);
     }
   }
 
   &__close-box {
-    position: absolute;
+    position: relative;
     width: 100%;
-    bottom: -1rem;
 
     >div {
-      padding-top: 0;
+      padding-top: .3rem;
       width: 100%;
       position: absolute;
       display: flex;
@@ -109,6 +113,10 @@
 
     &--isolated {
       padding: var(--van-dialog-header-isolated-padding);
+    }
+    &--padding20 {
+      padding-left: .2rem;
+      padding-right: .2rem
     }
   }
 
@@ -157,6 +165,10 @@
     display: flex;
     overflow: hidden;
     user-select: none;
+    &--padding20 {
+      padding-left: .2rem;
+      padding-right: .2rem
+    }
   }
 
   &__confirm,

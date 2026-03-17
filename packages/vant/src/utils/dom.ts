@@ -1,5 +1,5 @@
 import { useRect, useWindowSize } from '@vant/use';
-import { unref, Ref } from 'vue';
+import { unref, Ref, toRaw } from 'vue';
 import { isIOS as checkIsIOS } from './basic';
 
 export type ScrollElement = Element | Window;
@@ -116,4 +116,21 @@ export function getContainingBlock(el: Element) {
   }
 
   return null;
+}
+
+export function getElement(target: any) {
+  if (!target)
+    return null;
+  if (target instanceof HTMLElement)
+    return target;
+  if (target.$el && target.$el instanceof HTMLElement)
+    return target.$el;
+  try {
+    const t = toRaw(target);
+    if (t instanceof HTMLElement)
+      return t;
+    if (t != null && t.$el && t.$el instanceof HTMLElement)
+      return t.$el
+  } catch (t) {}
+  return null
 }

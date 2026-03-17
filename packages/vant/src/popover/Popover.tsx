@@ -11,7 +11,12 @@ import {
   type TeleportProps,
   type ExtractPropTypes,
 } from 'vue';
-import { Instance, Modifier, createPopper, offsetModifier } from '@vant/popperjs';
+import {
+  Instance,
+  Modifier,
+  createPopper,
+  offsetModifier,
+} from '@vant/popperjs';
 
 // Utils
 import {
@@ -30,7 +35,7 @@ import {
 } from '../utils';
 
 // Composables
-import { useClickAway } from '@vant/use';
+import { useClickAway, useRect } from '@vant/use';
 import { useScopeId } from '../composables/use-scope-id';
 import { useSyncPropRef } from '../composables/use-sync-prop-ref';
 
@@ -56,6 +61,7 @@ const popupProps = [
   'overlayStyle',
   'overlayClass',
   'closeOnClickOverlay',
+  'lazyRender'
 ] as const;
 
 export const popoverProps = {
@@ -71,10 +77,14 @@ export const popoverProps = {
   placement: makeStringProp<PopoverPlacement>('bottom'),
   iconPrefix: String,
   overlayClass: unknownProp,
+  wrapperClass: unknownProp,
+  popoverClass: unknownProp,
   overlayStyle: Object as PropType<CSSProperties>,
   closeOnClickAction: truthProp,
   closeOnClickOverlay: truthProp,
   closeOnClickOutside: truthProp,
+  readonly: Boolean,
+  lazyRender: Boolean,
   offset: {
     type: Array as unknown as PropType<[number, number]>,
     default: () => [0, 8],
@@ -83,6 +93,8 @@ export const popoverProps = {
     type: [String, Object] as PropType<TeleportProps['to']>,
     default: 'body',
   },
+  autoFlip: Boolean,
+  destroyOnClose: Boolean
 };
 
 export type PopoverProps = ExtractPropTypes<typeof popoverProps>;
@@ -122,17 +134,17 @@ export default defineComponent({
           },
         }),
         {
-          name: "clampLeftToZero",
+          name: 'clampLeftToZero',
           enabled: true,
-          phase: "main",
-          requires: ["popperOffsets"],
-          fn({ state } : { state : any }) {
+          phase: 'main',
+          requires: ['popperOffsets'],
+          fn({ state }: { state: any }) {
             const offsets = state.modifiersData.popperOffsets;
             if (!offsets) return;
 
             if (offsets.x < 0) offsets.x = 0;
           },
-        }
+        },
       ] as Array<Partial<Modifier<any, any>>>,
     });
 
@@ -170,8 +182,11 @@ export default defineComponent({
     };
 
     const onClickWrapper = () => {
-      if (props.trigger === 'click') {
-        show.value = !show.value;
+      if(props.readonly ) {
+      } else {
+        if (props.trigger === 'click') {
+          show.value = !show.value;
+        }
       }
     };
 
@@ -263,17 +278,39 @@ export default defineComponent({
 
     useClickAway([wrapperRef, popupRef], onClickAway, {
       eventName: 'touchstart',
+      capture: true
     });
+
+    // const A = xf({
+    //     el: wrapperRef
+    //   })
+    //   , O = () => {
+    //     if (!props.autoFlip)
+    //       return !1;
+    //     const P = useRect(wrapperRef)
+    //       , {clientHeight: T} = document.documentElement
+    //       , x = l.value.includes("top")
+    //       , V = l.value.includes("bottom")
+    //       , G = l.value.includes("left")
+    //       , q = l.value.includes("right");
+    //     (x || V) && (T - C.value < P.bottom ? l.value = l.value.replace(/bottom/, "top") : l.value = l.value.replace(/top/, "bottom")),
+    //     (G || q) && (T - C.value < P.top ? l.value = l.value.replace(/start/, "end") : l.value = l.value.replace(/end/, "start"))
+    //   }
+    // ;
 
     return () => (
       <>
-        <span ref={wrapperRef} class={bem('wrapper')} onClick={onClickWrapper}>
+        <span
+          ref={wrapperRef}
+          class={[bem('wrapper'), props.wrapperClass]}
+          onClick={onClickWrapper}
+        >
           {slots.reference?.()}
         </span>
         <Popup
           ref={popoverRef}
           show={show.value}
-          class={bem([props.theme])}
+          class={[bem([props.theme]), props.popoverClass]}
           position={''}
           transition={props.transition}
           lockScroll={false}
@@ -282,7 +319,11 @@ export default defineComponent({
           {...useScopeId()}
           {...pick(props, popupProps)}
         >
-          {props.showArrow && <div class={bem('arrow')}><span class={bem('arrow-content')}></span></div>}
+          {props.showArrow && (
+            <div class={bem('arrow')}>
+              <span class={bem('arrow-content')}></span>
+            </div>
+          )}
           <div role="menu" class={bem('content', props.actionsDirection)}>
             {slots.default ? slots.default() : props.actions.map(renderAction)}
           </div>

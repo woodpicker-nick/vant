@@ -19,4 +19,17 @@
   justify-content: center;
   align-items: center;
   touch-action: none;
+  &.isShowFrostedGlassEffect {
+    backdrop-filter: blur(10px);
+  }
+}
+
+.van-overlay[data-hidden="1"] {
+  --ui-overlay-background: rgba(0, 0, 0, 0);
+  pointer-events: none;
+  background: transparent;
+}
+
+.van-overlay[data-hidden="1"]>* {
+  pointer-events: auto
 }

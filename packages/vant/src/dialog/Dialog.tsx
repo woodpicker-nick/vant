@@ -69,12 +69,14 @@ export const dialogProps = extend({}, popupSharedProps, {
   customClose: {
     type: String as PropType<DialogCustomStyle> | undefined,
   },
+  isShowFrostedGlassEffect: Boolean
 });
 
 export type DialogProps = ExtractPropTypes<typeof dialogProps>;
 
 const popupInheritKeys = [
   ...popupSharedPropKeys,
+  'isShowFrostedGlassEffect',
   'transition',
   'closeOnPopstate',
   'destroyOnClose',

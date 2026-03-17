@@ -36,6 +36,9 @@ export const overlayProps = {
   lazyRender: truthProp,
   customStyle: Object as PropType<CSSProperties>,
   teleport: [String, Object] as PropType<TeleportProps['to']>,
+  isShowFrostedGlassEffect: Boolean,
+  hiddenWrap: Boolean,
+  destroyOnClose: Boolean
 };
 
 export type OverlayProps = ExtractPropTypes<typeof overlayProps>;
@@ -72,8 +75,9 @@ export default defineComponent({
           v-show={props.show}
           ref={root}
           style={style}
-          class={[bem(), props.className]}
+          class={[bem(), props.className, props.isShowFrostedGlassEffect ? "isShowFrostedGlassEffect" : ""]}
           {...attrs}
+          data-hidden={props.hiddenWrap ? "1" : "0"}
         >
           {slots.default?.()}
         </div>
@@ -86,6 +90,10 @@ export default defineComponent({
     });
 
     return () => {
+      if (!props.show && props.destroyOnClose) {
+        return;
+      }
+
       const Content = (
         <Transition
           v-slots={{ default: renderOverlay }}

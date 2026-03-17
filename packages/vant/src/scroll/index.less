@@ -1,0 +1,67 @@
+.van-scroll {
+  &.lobby-scroll {
+    &.lobby-scroll--all {
+      overflow: scroll;
+    }
+
+    &.lobby-scroll--x {
+      overflow-x: scroll;
+      overflow-y: hidden;
+    }
+
+    &.lobby-scroll--y {
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+
+    &.lobby-scroll--system-scrollbar {
+      html[data-isdesktop="0"] & {
+        scrollbar-color: var(--skin__border) transparent;
+        scrollbar-width: thin;
+
+        > * {
+          scrollbar-color: auto;
+        }
+      }
+
+      &::-webkit-scrollbar {
+        z-index: 11;
+        width: .06rem;
+      }
+
+      &::-webkit-scrollbar-thumb {
+        width: .06rem;
+        background: var(--skin__border);
+        border-radius: .06rem;
+      }
+
+      &::-webkit-scrollbar-corner {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-track {
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar-track-piece {
+        width: .06rem;
+        background: transparent;
+      }
+
+      &::-webkit-scrollbar:horizontal {
+        height: .06rem;
+      }
+
+      &::-webkit-scrollbar:horizontal-thumb {
+        border-radius: .06rem;
+      }
+    }
+
+    &.lobby-scroll--is-desktop {
+      &.lobby-scroll--is-firefox,
+      &.lobby-scroll--is-tg.lobby-scroll--hide-in-tg {
+        scrollbar-width: none;
+      }
+    }
+  }
+}

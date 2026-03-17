@@ -1,6 +1,6 @@
 {
   "name": "vant",
-  "version": "4.9.22-74",
+  "version": "4.9.22-95",
   "description": "Mobile UI Components built on Vue",
   "main": "lib/vant.cjs.js",
   "module": "es/index.mjs",
@@ -38,18 +38,15 @@
   ],
   "dependencies": {
     "@vant/popperjs": "workspace:^",
-    "@vant/use": "workspace:^",
-    "@vue/shared": "^3.5.26",
-    "@vueuse/core": "^14.2.1",
-    "lodash-es": "^4.17.23",
-    "vue-dragscroll": "^4.0.6",
-    "vue": "^3.0.0"
+    "@vant/use": "workspace:^"
   },
   "peerDependencies": {
     "@vueuse/core": "^14.2.1",
+    "@vue/shared": "^3.5.26",
     "lodash-es": "^4.17.23",
+    "vue": "^3.0.0",
     "vue-dragscroll": "^4.0.6",
-    "vue": "^3.0.0"
+    "perfect-scrollbar": "^1.5.6"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
@@ -71,7 +68,12 @@
     "vitest": "^3.2.4",
     "vitest-canvas-mock": "^0.3.3",
     "vue": "^3.5.26",
-    "vue-router": "^4.6.4"
+    "vue-router": "^4.6.4",
+    "vue-dragscroll": "^4.0.6",
+    "@vueuse/core": "^14.2.1",
+    "lodash-es": "^4.17.23",
+    "perfect-scrollbar": "^1.5.6",
+    "@vue/shared": "^3.5.26"
   },
   "sideEffects": [
     "es/**/style/*",

@@ -1,0 +1,97 @@
+:root,
+:host {
+  --van-select-input-background: var(--van-background-2);
+  --van-select-input-readonly-background: var(--van-background-1);
+  --van-select-input-color: var(--van-text-color);
+  --van-select-input-hiddenCursor: var(--van-gray-6);
+  --van-select-input-placeholder: var(--van-gray-6);
+  --van-select-input-star-sign: var(--van-background-3);
+}
+
+.van-select-input {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+  background-color: var(--van-select-input-background);
+  padding: 0 .2rem;
+  box-sizing: border-box
+}
+
+.van-select-input__prefix {
+  padding-right: .1rem
+}
+
+[dir=rtl] .van-select-input__prefix {
+  padding-right: 0;
+  padding-left: .1rem
+}
+
+.van-select-input__suffix {
+  padding-left: .2rem
+}
+
+[dir=rtl] .van-select-input__suffix {
+  padding-left: 0;
+  padding-right: .2rem
+}
+
+.van-select-input__suffix,.van-select-input__prefix {
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  box-sizing: border-box;
+  opacity: 1
+}
+
+.van-select-input--isReadOnly {
+  background-color: var(--van-select-input-readonly-background)
+}
+
+.van-select-input__input {
+  color: var(--van-select-input-color);
+  flex: 1;
+  height: 100%;
+  width: 100%;
+  background: transparent
+}
+
+.van-select-input__input--hiddenCursor {
+  color: transparent;
+  cursor: pointer;
+  text-shadow: 0 0 0 var(--van-select-input-hiddenCursor)
+}
+
+.van-select-input__input::placeholder {
+  font-size: .22rem;
+  color: var(--skin__neutral_3)
+}
+
+.van-select-input__input--hasSuffix {
+  padding-right: 0
+}
+
+[dir=rtl] .van-select-input__input--hasSuffix {
+  padding-right: 0;
+  padding-left: 0
+}
+
+.van-select-input__star-sign {
+  color: var(--van-select-input-star-sign);
+  width: .12rem;
+  height: 100%;
+  display: flex;
+  align-items: center
+}
+
+input[type=search] {
+  -webkit-appearance: none;
+  appearance: none
+}
+
+input[type=search]::-webkit-search-decoration,input[type=search]::-webkit-search-cancel-button {
+  display: none;
+  -webkit-appearance: none
+}

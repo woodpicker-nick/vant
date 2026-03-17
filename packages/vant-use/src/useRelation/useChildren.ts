@@ -75,7 +75,7 @@ export function sortChildren(
 export function useChildren<
   // eslint-disable-next-line
   Child extends ComponentPublicInstance = ComponentPublicInstance<{}, any>,
-  ProvideValue = never,
+  ProvideValue = any,
 >(key: InjectionKey<ProvideValue>) {
   const publicChildren: Child[] = reactive([]);
   const internalChildren: ComponentInternalInstance[] = reactive([]);

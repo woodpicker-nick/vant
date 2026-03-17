@@ -54,6 +54,7 @@ export const popupProps = extend({}, popupSharedProps, {
   destroyOnClose: Boolean,
   safeAreaInsetTop: Boolean,
   safeAreaInsetBottom: Boolean,
+  isShowFrostedGlassEffect: Boolean
 });
 
 export type PopupProps = ExtractPropTypes<typeof popupProps>;
@@ -89,7 +90,7 @@ export default defineComponent({
 
     const style = computed(() => {
       const style: CSSProperties = {
-        zIndex: zIndex.value,
+        zIndex: zIndex.value
       };
 
       if (isDef(props.duration)) {
@@ -135,33 +136,31 @@ export default defineComponent({
     };
 
     const renderOverlay = () => {
-      if (props.overlay) {
-        const overlayProps = extend(
-          {
-            show: props.show,
-            class: props.overlayClass,
-            zIndex: zIndex.value,
-            duration: props.duration,
-            customStyle: props.overlayStyle,
-            role: props.closeOnClickOverlay ? 'button' : undefined,
-            tabindex: props.closeOnClickOverlay ? 0 : undefined,
-          },
-          props.overlayProps,
-        );
+      const overlayProps = extend(
+        {
+          show: props.show,
+          class: props.overlayClass,
+          zIndex: zIndex.value,
+          duration: props.duration,
+          customStyle: props.overlayStyle,
+          role: props.closeOnClickOverlay ? 'button' : undefined,
+          tabindex: props.closeOnClickOverlay ? 0 : undefined,
+          isShowFrostedGlassEffect: props.isShowFrostedGlassEffect,
+        },
+        props.overlayProps,
+      );
 
-        return (
-          <Overlay
-            {...overlayProps}
-            {...useScopeId()}
-            onClick={onClickOverlay}
-            {...{ style: attrs.style }}
-          >
-            {renderTransition()}
-          </Overlay>
-        );
-      } else {
-        return renderTransition();
-      }
+      return (
+        <Overlay
+          {...overlayProps}
+          {...useScopeId()}
+          onClick={onClickOverlay}
+          hiddenWrap={!props.overlay}
+          destroyOnClose={props.destroyOnClose}
+        >
+          {renderTransition()}
+        </Overlay>
+      );
     };
 
     const onClickCloseIcon = (event: MouseEvent) => {
@@ -206,7 +205,6 @@ export default defineComponent({
         safeAreaInsetTop,
         safeAreaInsetBottom,
         show,
-        overlay,
       } = props;
 
       if (!show && destroyOnClose) {
@@ -228,9 +226,10 @@ export default defineComponent({
             {
               'van-safe-area-top': safeAreaInsetTop,
               'van-safe-area-bottom': safeAreaInsetBottom,
-            },  attrs.class
+            }
           ]}
           onKeydown={onKeydown}
+          {...attrs}
           {...useScopeId()}
           onClick={(e) => {
             e.stopPropagation();

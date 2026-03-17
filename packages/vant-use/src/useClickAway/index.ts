@@ -4,6 +4,8 @@ import { useEventListener } from '../useEventListener';
 
 export type UseClickAwayOptions = {
   eventName?: string;
+  capture?: boolean;
+  passive?: boolean;
 };
 
 export function useClickAway(
@@ -32,5 +34,5 @@ export function useClickAway(
     }
   };
 
-  useEventListener(eventName, onClick, { target: document });
+  useEventListener(eventName, onClick, { target: document, ...options });
 }
