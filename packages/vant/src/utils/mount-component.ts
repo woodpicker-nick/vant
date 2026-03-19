@@ -1,4 +1,4 @@
-import { createApp, reactive, Component, getCurrentInstance } from 'vue';
+import { createApp, reactive, Component } from 'vue';
 import { extend } from './basic';
 import { useExpose } from '../composables/use-expose';
 
@@ -44,9 +44,4 @@ export function mountComponent(RootComponent: Component) {
       document.body.removeChild(root);
     },
   };
-}
-
-export function mergeComponentState(e: object) {
-  const t = getCurrentInstance() as any;
-  t && Object.assign(t.proxy, e);
 }

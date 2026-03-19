@@ -67,7 +67,7 @@ export default defineComponent({
       const ENTER_CODE = 13;
       if (event.keyCode === ENTER_CODE) {
         preventDefault(event);
-        emit('search', props.modelValue);
+        emit('search', props.value);
       }
     };
 
@@ -130,16 +130,13 @@ export default defineComponent({
           ref={fieldRef}
           type="search"
           class={bem('field', { 'with-message': fieldAttrs.errorMessage })}
-          border={false}
-          labelAlign="left"
           onBlur={onBlur}
           onFocus={onFocus}
           onClear={onClear}
-          onKeypress={onKeypress}
-          onClickInput={onClickInput}
-          onClickLeftIcon={onClickLeftIcon}
-          onClickRightIcon={onClickRightIcon}
-          onUpdate:modelValue={onInput}
+          onInput={onKeypress}
+          onClickPrefix={onClickLeftIcon}
+          onClickSuffix={onClickRightIcon}
+          onUpdate:value={onInput}
           {...fieldAttrs}
         />
       );

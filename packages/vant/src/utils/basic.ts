@@ -20,6 +20,8 @@ export const isDef = <T>(val: T): val is NonNullable<T> =>
 
 export const isNull = (val: any) => val == null;
 
+export const isNotNull = (val: any) => val != null;
+
 
 export function isNotVueObject(e: any) {
   return typeof e == "function" || Object.prototype.toString.call(e) === "[object Object]" && !isVNode(e)

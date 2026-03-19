@@ -76,8 +76,6 @@ export type ConfigProviderThemeVars = BaseThemeVars &
   import('../action-bar-button').ActionBarButtonThemeVars &
   import('../action-bar-icon').ActionBarIconThemeVars &
   import('../action-sheet').ActionSheetThemeVars &
-  import('../address-edit').AddressEditThemeVars &
-  import('../address-list').AddressListThemeVars &
   import('../back-top').BackTopThemeVars &
   import('../badge').BadgeThemeVars &
   import('../barrage').BarrageThemeVars &
@@ -90,13 +88,7 @@ export type ConfigProviderThemeVars = BaseThemeVars &
   import('../checkbox').CheckboxThemeVars &
   import('../circle').CircleThemeVars &
   import('../collapse-item').CollapseItemThemeVars &
-  import('../contact-card').ContactCardThemeVars &
-  import('../contact-edit').ContactEditThemeVars &
-  import('../contact-list').ContactListThemeVars &
   import('../count-down').CountDownThemeVars &
-  import('../coupon').CouponThemeVars &
-  import('../coupon-cell').CouponCellThemeVars &
-  import('../coupon-list').CouponListThemeVars &
   import('../dialog').DialogThemeVars &
   import('../divider').DividerThemeVars &
   import('../dropdown-item').DropdownItemThemeVars &

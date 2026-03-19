@@ -48,7 +48,7 @@ export default defineComponent({
   name,
   props: selectOptionsProps,
   emits: ["optionClick"],
-  setup(props, { emit, slots }) {
+  setup(props, { slots }) {
     const {parent: n, index: o} = useParent(SELECT_KEY)
       , a = ref(!1);
     if (!n) {
@@ -63,6 +63,7 @@ export default defineComponent({
         props.disabled || n.handleClick(u, {
           value: props.value,
           label: props.label,
+          icon: props.icon,
           disabled: props.disabled
         })
       }

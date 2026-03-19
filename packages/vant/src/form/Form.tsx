@@ -1,50 +1,30 @@
-import { defineComponent, type PropType, type ExtractPropTypes } from 'vue';
+import { defineComponent, type ExtractPropTypes } from 'vue';
 
 // Utils
-import {
-  FORM_KEY,
-  truthProp,
-  numericProp,
-  preventDefault,
-  createNamespace,
-} from '../utils';
+import { FORM_KEY, createNamespace } from '../utils';
 
 // Composables
 import { useChildren } from '@vant/use';
 import { useExpose } from '../composables/use-expose';
 
-// Types
-import type {
-  FieldTextAlign,
-  FieldValidateError,
-  FieldValidateTrigger,
-  FieldValidationStatus,
-} from '../field/types';
 import type { FormExpose } from './types';
+import { useForm } from 'vee-validate';
 
 const [name, bem] = createNamespace('form');
 
 export const formProps = {
-  colon: Boolean,
-  disabled: Boolean,
-  readonly: Boolean,
-  required: [Boolean, String] as PropType<boolean | 'auto'>,
-  showError: Boolean,
-  labelWidth: numericProp,
-  labelAlign: String as PropType<FieldTextAlign>,
-  inputAlign: String as PropType<FieldTextAlign>,
-  scrollToError: Boolean,
-  scrollToErrorPosition: String as PropType<ScrollLogicalPosition>,
-  validateFirst: Boolean,
-  submitOnEnter: truthProp,
-  showErrorMessage: truthProp,
-  errorMessageAlign: String as PropType<FieldTextAlign>,
-  validateTrigger: {
-    type: [String, Array] as PropType<
-      FieldValidateTrigger | FieldValidateTrigger[]
-    >,
-    default: 'onBlur',
+  layout: {
+    type: String,
+    default: 'horizontal',
   },
+  labelWidth: {
+    type: String,
+  },
+  model: {
+    type: Object,
+    required: !0,
+  },
+  scrollToError: Boolean,
 };
 
 export type FormProps = ExtractPropTypes<typeof formProps>;
@@ -54,162 +34,63 @@ export default defineComponent({
 
   props: formProps,
 
-  emits: ['submit', 'failed'],
+  emits: ['submit'],
 
   setup(props, { emit, slots }) {
-    const { children, linkChildren } = useChildren(FORM_KEY);
+    const { linkChildren } = useChildren<any>(FORM_KEY);
 
-    const getFieldsByNames = (names?: string[]) => {
-      if (names) {
-        return children.filter((field) => names.includes(field.name));
-      }
-      return children;
-    };
+    linkChildren({
+      layout: props.layout,
+      labelWidth: props.labelWidth,
+    });
 
-    const validateSeq = (names?: string[]) =>
-      new Promise<void>((resolve, reject) => {
-        const errors: FieldValidateError[] = [];
-        const fields = getFieldsByNames(names);
+    const {
+      values,
+      meta,
+      validate,
+      setErrors,
+      setFieldValue,
+      setValues,
+      resetForm,
+      errors,
+      handleSubmit,
+      validateField,
+    } = useForm({
+      initialValues: props.model,
+    });
 
-        fields
-          .reduce(
-            (promise, field) =>
-              promise.then(() => {
-                if (!errors.length) {
-                  return field.validate().then((error?: FieldValidateError) => {
-                    if (error) {
-                      errors.push(error);
-                    }
-                  });
-                }
-              }),
-            Promise.resolve(),
-          )
-          .then(() => {
-            if (errors.length) {
-              reject(errors);
-            } else {
-              resolve();
-            }
-          });
-      });
-
-    const validateAll = (names?: string[]) =>
-      new Promise<void>((resolve, reject) => {
-        const fields = getFieldsByNames(names);
-        Promise.all(fields.map((item) => item.validate())).then((errors) => {
-          errors = errors.filter(Boolean);
-
-          if (errors.length) {
-            reject(errors);
-          } else {
-            resolve();
-          }
-        });
-      });
-
-    const validateField = (name: string) => {
-      const matched = children.find((item) => item.name === name);
-
-      if (matched) {
-        return new Promise<void>((resolve, reject) => {
-          matched.validate().then((error?: FieldValidateError) => {
-            if (error) {
-              reject(error);
-            } else {
-              resolve();
-            }
-          });
-        });
-      }
-
-      return Promise.reject();
-    };
-
-    const validate = (name?: string | string[]) => {
-      if (typeof name === 'string') {
-        return validateField(name);
-      }
-      return props.validateFirst ? validateSeq(name) : validateAll(name);
-    };
-
-    const resetValidation = (name?: string | string[]) => {
-      if (typeof name === 'string') {
-        name = [name];
-      }
-
-      const fields = getFieldsByNames(name);
-      fields.forEach((item) => {
-        item.resetValidation();
-      });
-    };
-
-    const getValidationStatus = () =>
-      children.reduce<Record<string, FieldValidationStatus>>((form, field) => {
-        form[field.name] = field.getValidationStatus();
-        return form;
-      }, {});
-
-    const scrollToField = (
-      name: string,
-      options?: boolean | ScrollIntoViewOptions,
-    ) => {
-      children.some((item) => {
-        if (item.name === name) {
-          item.$el.scrollIntoView(options);
-          return true;
-        }
-        return false;
-      });
-    };
-
-    const getValues = () =>
-      children.reduce<Record<string, unknown>>((form, field) => {
-        if (field.name !== undefined) {
-          form[field.name] = field.formValue.value;
-        }
-        return form;
-      }, {});
-
-    const submit = () => {
-      const values = getValues();
-
-      validate()
-        .then(() => emit('submit', values))
-        .catch((errors: FieldValidateError[]) => {
-          emit('failed', { values, errors });
-          const { scrollToError, scrollToErrorPosition } = props;
-
-          if (scrollToError && errors[0].name) {
-            scrollToField(
-              errors[0].name,
-              scrollToErrorPosition
-                ? {
-                    block: scrollToErrorPosition,
-                  }
-                : undefined,
-            );
-          }
-        });
-    };
-
-    const onSubmit = (event: Event) => {
-      preventDefault(event);
-      submit();
+    const onSubmit = () => {
+      emit('submit', values);
     };
 
     linkChildren({ props });
     useExpose<FormExpose>({
-      submit,
       validate,
-      getValues,
-      scrollToField,
-      resetValidation,
-      getValidationStatus,
+      validateField,
+      resetForm,
+      setErrors,
+      setFieldValue,
+      setValues,
+      errors,
+      submit: async () => {
+        await validate();
+        if (meta.value.valid) onSubmit();
+        else if (props.scrollToError) {
+          const el = document.querySelector(
+            '.van-form-item__explain[data-formitem-error="true"]',
+          );
+          el &&
+            el.scrollIntoView({
+              behavior: 'smooth',
+              block: 'center',
+              inline: 'nearest',
+            });
+        }
+      },
     });
 
     return () => (
-      <form class={bem()} onSubmit={onSubmit}>
+      <form class={bem()} novalidate={true} onSubmit={handleSubmit(onSubmit)}>
         {slots.default?.()}
       </form>
     );

@@ -1,6 +1,6 @@
 {
   "name": "vant",
-  "version": "4.9.22-95",
+  "version": "4.9.22-103",
   "description": "Mobile UI Components built on Vue",
   "main": "lib/vant.cjs.js",
   "module": "es/index.mjs",
@@ -41,12 +41,13 @@
     "@vant/use": "workspace:^"
   },
   "peerDependencies": {
-    "@vueuse/core": "^14.2.1",
     "@vue/shared": "^3.5.26",
+    "@vueuse/core": "^14.2.1",
     "lodash-es": "^4.17.23",
+    "perfect-scrollbar": "^1.5.6",
     "vue": "^3.0.0",
     "vue-dragscroll": "^4.0.6",
-    "perfect-scrollbar": "^1.5.6"
+    "vee-validate": "^4.15.1"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
@@ -59,21 +60,22 @@
     "@vitejs/plugin-vue-jsx": "^4.2.0",
     "@vitest/coverage-istanbul": "^3.2.4",
     "@vue/runtime-core": "^3.5.26",
+    "@vue/shared": "^3.5.26",
     "@vue/test-utils": "^2.4.6",
+    "@vueuse/core": "^14.2.1",
     "csstype": "^3.2.3",
     "diffable-html": "^6.0.1",
     "jsdom": "^25.0.1",
+    "lodash-es": "^4.17.23",
+    "perfect-scrollbar": "^1.5.6",
     "typescript": "^5.9.3",
+    "vee-validate": "^4.15.1",
     "vite": "^5.4.20",
     "vitest": "^3.2.4",
     "vitest-canvas-mock": "^0.3.3",
     "vue": "^3.5.26",
-    "vue-router": "^4.6.4",
     "vue-dragscroll": "^4.0.6",
-    "@vueuse/core": "^14.2.1",
-    "lodash-es": "^4.17.23",
-    "perfect-scrollbar": "^1.5.6",
-    "@vue/shared": "^3.5.26"
+    "vue-router": "^4.6.4"
   },
   "sideEffects": [
     "es/**/style/*",

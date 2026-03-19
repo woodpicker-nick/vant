@@ -32,8 +32,8 @@ import SelectSingle from '../select-single';
 import SelectOption from '../select-options';
 import Popover, { type PopoverPlacement } from '../popover';
 import Scroller from '../scroll';
-import { mergeComponentState } from '../utils/mount-component';
 import { icons } from './icon';
+import { useExpose } from "../composables/use-expose";
 
 const [name, bem] = createNamespace('select');
 
@@ -193,6 +193,10 @@ export const selectProps = {
     type: String,
     default: 'bottom',
   },
+  noDataText: {
+    type: String,
+    default: 'Data not found',
+  }
 };
 
 export type SelectProps = ExtractPropTypes<typeof selectProps>;
@@ -527,7 +531,7 @@ export default defineComponent({
           z && (C = !1);
         },
       ),
-      mergeComponentState({
+      useExpose({
         close: Z,
         open: ue,
         showPopover: o,
@@ -620,10 +624,10 @@ export default defineComponent({
                         isNotVueObject(content) ? content : [content],
                     }}
                   ></Scroller>
-                ) : props.renderNotFount ? (
-                  props.renderNotFount()
+                ) : slots.notData ? (
+                  slots.notData()
                 ) : (
-                  <div class={bem('not-found')}></div>
+                  <div class={bem('not-found')}>{props.noDataText}</div>
                 )}
               </div>
             ),

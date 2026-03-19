@@ -25,8 +25,8 @@ import {
 } from '@vueuse/core';
 import { dragscroll } from 'vue-dragscroll';
 import { browerUtil } from '../utils';
-import { mergeComponentState } from '../utils/mount-component';
 import { scroll } from './utils';
+import { useExpose } from "../composables/use-expose";
 
 const [name, bem] = createNamespace('scroll');
 
@@ -264,7 +264,7 @@ export default defineComponent({
         });
       }));
     //const q = WO();
-    mergeComponentState({
+    useExpose({
       scrollEl: a,
       scroller: s,
       scrollTo: (j: any, W = {}) => {

@@ -18,6 +18,8 @@ const [name, bem] = createNamespace('icon');
 
 const isImage = (name?: string) => name?.includes('/');
 
+const isSvg = (name?: string) => name?.startsWith('<svg');
+
 export const iconProps = {
   dot: Boolean,
   tag: makeStringProp<keyof HTMLElementTagNameMap>('i'),
@@ -45,6 +47,7 @@ export default defineComponent({
 
     return () => {
       const { tag, dot, name, size, badge, color } = props;
+      const isSvgIcon = isSvg(name);
       const isImageIcon = isImage(name);
 
       return (
@@ -53,7 +56,7 @@ export default defineComponent({
           tag={tag}
           class={[
             classPrefix.value,
-            isImageIcon ? '' : `${classPrefix.value}-${name}`,
+            isImageIcon || isSvgIcon ? '' : `${classPrefix.value}-${name}`,
           ]}
           style={{
             color,
@@ -63,7 +66,11 @@ export default defineComponent({
           {...props.badgeProps}
         >
           {slots.default?.()}
-          {isImageIcon && <img class={bem('image')} src={name} />}
+          {isSvgIcon ? (
+            <i class={bem('svg')} v-html={name}></i>
+          ) : (
+            isImageIcon && <img class={bem('image')} src={name} />
+          )}
         </Badge>
       );
     };

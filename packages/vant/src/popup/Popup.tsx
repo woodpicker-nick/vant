@@ -157,6 +157,7 @@ export default defineComponent({
           onClick={onClickOverlay}
           hiddenWrap={!props.overlay}
           destroyOnClose={props.destroyOnClose}
+          lazyRender={props.lazyRender}
         >
           {renderTransition()}
         </Overlay>

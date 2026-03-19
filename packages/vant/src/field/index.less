@@ -1,207 +1,158 @@
 :root,
 :host {
-  --van-field-label-width: 6.2em;
-  --van-field-label-color: var(--van-text-color);
-  --van-field-label-margin-right: var(--van-padding-sm);
+  --van-field-background-color: var(--van-background);
+  --van-field-color: var(--van-text-color);
+  --van-field-force-within-border-color: var(--van-primary-color);
   --van-field-input-text-color: var(--van-text-color);
-  --van-field-input-error-text-color: var(--van-danger-color);
-  --van-field-input-disabled-text-color: var(--van-text-color-3);
-  --van-field-placeholder-text-color: var(--van-text-color-3);
-  --van-field-icon-size: 18px;
-  --van-field-clear-icon-size: 18px;
-  --van-field-clear-icon-color: var(--van-gray-5);
-  --van-field-right-icon-color: var(--van-gray-6);
-  --van-field-error-message-color: var(--van-danger-color);
-  --van-field-error-message-font-size: 12px;
-  --van-field-text-area-min-height: 60px;
-  --van-field-word-limit-color: var(--van-gray-7);
-  --van-field-word-limit-font-size: var(--van-font-size-sm);
-  --van-field-word-limit-line-height: 16px;
-  --van-field-disabled-text-color: var(--van-text-color-3);
-  --van-field-required-mark-color: var(--van-red);
+  --van-field-eye-show-color: var(--van-primary-color);
 }
 
 .van-field {
-  flex-wrap: wrap;
+  border: var(--van-border-width) solid var(--van-border-color);
+  height: .7rem;
+  width: 100%;
+  border-radius: .1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  background-color: var(--van-field-background-color);
+  color: var(--van-field-color);
+  font-size: .22rem;
+  padding: 0 .2rem
+}
 
-  &__label {
-    flex: none;
-    box-sizing: border-box;
-    width: var(--van-field-label-width);
-    margin-right: var(--van-field-label-margin-right);
-    color: var(--van-field-label-color);
-    text-align: left;
-    word-wrap: break-word;
-
-    &--center {
-      text-align: center;
-    }
-
-    &--right {
-      text-align: right;
-    }
-
-    &--top {
-      display: flex;
-      width: 100%;
-      text-align: left;
-      margin-bottom: var(--van-padding-base);
-      overflow-wrap: break-word;
-    }
-
-    &--required {
-      &::before {
-        margin-right: 2px;
-        color: var(--van-field-required-mark-color);
-        content: '*';
-      }
-    }
+.van-field{
+  .van-divider--vertical {
+    height: 100%;
+    padding: 0.1rem 0;
   }
+}
 
-  &--disabled {
-    .van-field__label {
-      color: var(--van-field-disabled-text-color);
-    }
+.van-field input[type=number] {
+  -moz-appearance: textfield
+}
+
+.van-field--disabled {
+  background-color: var(--van-field-input-disabled-text-color)
+}
+
+.van-field--textarea {
+  height: auto;
+  padding: 0
+}
+
+.van-field:focus-within {
+  border-color: var(--van-field-force-within-border-color)
+}
+
+.van-field:focus-within .van-field__clear {
+  opacity: 1
+}
+
+.van-field__input-wrap {
+  flex: 1;
+  height: 100%;
+  line-height: .7rem;
+  display: flex;
+  overflow: hidden
+}
+
+.van-field__input-container {
+  flex: 1;
+  display: flex
+}
+
+.van-field__input {
+  color: var(--van-field-input-text-color);
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis
+}
+
+.van-field__input:-webkit-autofill {
+  -webkit-box-shadow: 0 0 0 1rem var(--van-background-2) inset;
+  -webkit-text-fill-color: var(--van-field-input-text-color)
+}
+
+.van-field__input::-webkit-outer-spin-button,.van-field__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0
+}
+
+.van-field__input::placeholder {
+  color: var(--van-warning-color);
+  font-weight: 400!important
+}
+
+.van-field__input:focus {
+  font-weight: 700
+}
+
+.van-field__input[type=tel] {
+  direction: inherit
+}
+
+.van-field__star-sign {
+  display: block;
+  color: var(--van-danger-color);
+  width: .12rem;
+  height: 100%
+}
+
+.van-field__prefix {
+  padding-right: .1rem
+}
+
+[dir=rtl] .van-field__prefix {
+  padding-right: 0;
+  padding-left: .1rem
+}
+
+.van-field__suffix,.van-field__prefix {
+  display: flex;
+  align-items: center;
+  height: 100%
+}
+
+.van-field__suffix {
+  &--padding {
+    padding-left: .2rem
   }
+}
 
-  &__value {
-    overflow: visible;
-  }
+.van-field__suffix-icon {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
 
-  &__body {
-    display: flex;
-    align-items: center;
-  }
+[dir=rtl] .van-field__suffix-icon {
+  padding-left: 0;
+}
 
-  &__control {
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0; // for flex-shrink in field__button
-    margin: 0;
-    padding: 0;
-    color: var(--van-field-input-text-color);
-    line-height: inherit;
-    text-align: left;
-    background-color: transparent;
-    border: 0;
-    resize: none;
-    // https://github.com/vant-ui/vant/pull/9418
-    user-select: auto;
+.van-field__eye {
+  color: var(--van-border-color);
+  font-size: .36rem
+}
 
-    &::placeholder {
-      color: var(--van-field-placeholder-text-color);
-    }
+.van-field__eye--show {
+  color: var(--van-field-eye-show-color)
+}
 
-    &:read-only {
-      cursor: default;
-    }
+.van-field__clear {
+  font-size: .35rem;
+  padding: 0;
+  margin: 0;
+  cursor: pointer
+}
 
-    &:disabled {
-      color: var(--van-field-input-disabled-text-color);
-      cursor: not-allowed;
-      opacity: 1;
-      // fix disabled color in mobile safari
-      -webkit-text-fill-color: var(--van-field-input-disabled-text-color);
-    }
-
-    &--center {
-      justify-content: center;
-      text-align: center;
-    }
-
-    &--right {
-      justify-content: flex-end;
-      text-align: right;
-    }
-
-    &--custom {
-      display: flex;
-      align-items: center;
-      min-height: var(--van-cell-line-height);
-    }
-
-    &--error,
-    &--error::placeholder {
-      color: var(--van-field-input-error-text-color);
-      -webkit-text-fill-color: currentColor;
-    }
-
-    &--min-height {
-      min-height: var(--van-field-text-area-min-height);
-    }
-
-    // for ios wechat
-    &[type='date'],
-    &[type='time'],
-    &[type='datetime-local'] {
-      min-height: var(--van-cell-line-height);
-    }
-
-    // for safari
-    &[type='search'] {
-      -webkit-appearance: none;
-    }
-  }
-
-  &__clear,
-  &__icon,
-  &__button,
-  &__right-icon {
-    flex-shrink: 0;
-  }
-
-  &__clear,
-  &__right-icon {
-    margin-right: calc(var(--van-padding-xs) * -1);
-    padding: 0 var(--van-padding-xs);
-    line-height: inherit;
-  }
-
-  &__clear {
-    color: var(--van-field-clear-icon-color);
-    font-size: var(--van-field-clear-icon-size);
-    cursor: pointer;
-  }
-
-  &__left-icon .van-icon,
-  &__right-icon .van-icon {
-    display: block;
-    font-size: var(--van-field-icon-size);
-    line-height: inherit;
-  }
-
-  &__left-icon {
-    margin-right: var(--van-padding-base);
-  }
-
-  &__right-icon {
-    color: var(--van-field-right-icon-color);
-  }
-
-  &__button {
-    padding-left: var(--van-padding-xs);
-  }
-
-  &__error-message {
-    color: var(--van-field-error-message-color);
-    font-size: var(--van-field-error-message-font-size);
-    text-align: left;
-
-    &--center {
-      text-align: center;
-    }
-
-    &--right {
-      text-align: right;
-    }
-  }
-
-  &__word-limit {
-    margin-top: var(--van-padding-base);
-    color: var(--van-field-word-limit-color);
-    font-size: var(--van-field-word-limit-font-size);
-    line-height: var(--van-field-word-limit-line-height);
-    text-align: right;
-  }
+.van-field textarea {
+  background: transparent;
+  border-color: transparent;
+  line-height: .34rem;
+  padding: .2rem;
+  overflow: auto;
+  white-space: normal
 }

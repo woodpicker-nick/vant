@@ -1,17 +1,23 @@
-import type { ComponentPublicInstance } from 'vue';
+import type { ComponentPublicInstance, ComputedRef } from 'vue';
 import type { FormProps } from './Form';
 import type { FieldValidationStatus } from '../field';
 
 export type FormExpose = {
   submit: () => void;
-  validate: (name?: string | string[] | undefined) => Promise<void>;
-  getValues: () => Record<string, unknown>;
-  scrollToField: (
-    name: string,
-    options?: boolean | ScrollIntoViewOptions | undefined,
-  ) => void;
-  resetValidation: (name?: string | string[] | undefined) => void;
-  getValidationStatus: () => Record<string, FieldValidationStatus>;
+  validate: (name?: any) => Promise<any>;
+  validateField: (name?: any) => Promise<any>;
+  resetForm: () => void;
+  setErrors: (fields: any) => void;
+  setFieldValue: (name?: any, shouldValidate?:boolean) => void;
+  setValues: (fields: any) => void;
+  errors: ComputedRef<Partial<Record<string, string | undefined>>>;
+  // getValues: () => Record<string, unknown>;
+  // scrollToField: (
+  //   name: string,
+  //   options?: boolean | ScrollIntoViewOptions | undefined,
+  // ) => void;
+  // resetValidation: (name?: string | string[] | undefined) => void;
+  // getValidationStatus: () => Record<string, FieldValidationStatus>;
 };
 
 export type FormProvide = {
