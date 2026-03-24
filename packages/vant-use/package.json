@@ -37,10 +37,12 @@
   "license": "MIT",
   "devDependencies": {
     "@rslib/core": "^0.19.2",
+    "async-validator": "^4.2.5",
     "typescript": "^5.9.3",
     "vue": "^3.5.26"
   },
   "peerDependencies": {
+    "async-validator": "^4.2.5",
     "vue": "^3.0.0"
   }
 }

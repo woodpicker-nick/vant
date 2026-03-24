@@ -35,7 +35,6 @@ import { ActionBarButton } from '../action-bar-button';
 // Types
 import type {
   DialogTheme,
-  DialogCustomStyle,
   DialogAction,
   DialogMessage,
   DialogMessageAlign,
@@ -66,9 +65,7 @@ export const dialogProps = extend({}, popupSharedProps, {
   keyboardEnabled: truthProp,
   destroyOnClose: Boolean,
   showClose: truthProp,
-  customClose: {
-    type: String as PropType<DialogCustomStyle> | undefined,
-  },
+  customClose1: Boolean,
   isShowFrostedGlassEffect: Boolean
 });
 
@@ -159,7 +156,7 @@ export default defineComponent({
       if (title) {
         return (
           <div
-            class={props.customClose ? bem('main', 'header', true) : bem('header', {
+            class={(props.customClose1 || slots.close ) ? bem('main', 'header', true) : bem('header', {
               isolated: !props.message && !slots.default,
             })}
           >
@@ -187,7 +184,7 @@ export default defineComponent({
 
     const renderContent = () => {
       if (slots.default) {
-        return <div class={props.customClose ? bem('main', 'content', true) : bem('content')}>{slots.default()}</div>;
+        return <div class={(props.customClose1 || slots.close ) ? bem('main', 'content', true) : bem('content')}>{slots.default()}</div>;
       }
 
       const { title, message, allowHtml } = props;
@@ -198,7 +195,7 @@ export default defineComponent({
             // add key to force re-render
             // see: https://github.com/vant-ui/vant/issues/7963
             key={allowHtml ? 1 : 0}
-            class={props.customClose ? bem('main', 'content', true) : bem('content', { isolated: !hasTitle })}
+            class={(props.customClose1 || slots.close ) ? bem('main', 'content', true) : bem('content', { isolated: !hasTitle })}
           >
             {renderMessage(hasTitle)}
           </div>
@@ -270,7 +267,7 @@ export default defineComponent({
     };
 
     const renderCustomCloseBox = () => {
-      if (props.customClose === '1') {
+      if (props.customClose1) {
         return (
           <div class={bem('close-box', 'occupy-space')}>
             <div>
@@ -300,7 +297,7 @@ export default defineComponent({
     };
 
     return () => {
-      const { width, title, theme, message, className, customClose, showClose } = props;
+      const { width, title, theme, message, className, customClose1, showClose } = props;
       return (
         <Popup
           ref={root}
@@ -313,7 +310,7 @@ export default defineComponent({
           onUpdate:show={updateShow}
           {...pick(props, popupInheritKeys)}
         >
-          {customClose ? (
+          {(customClose1 || slots.close) ? (
             <>
               <div class={bem('main')}>
                 {renderTitle()}

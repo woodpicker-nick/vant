@@ -17,17 +17,10 @@ import {
 } from 'vue';
 
 // Utils
-import {
-  FORM_KEY,
-  extend,
-  createNamespace,
-  isNotNull,
-} from '../utils';
+import { FORM_KEY, extend, createNamespace, isNotNull } from '../utils';
 
 // Composables
-import {
-  useParent,
-} from '@vant/use';
+import { useParent } from '@vant/use';
 import { useExpose } from '../composables/use-expose';
 
 // Components
@@ -38,19 +31,20 @@ import { icons } from './icon';
 
 import { useClipboard } from '../composables/use-clipboard';
 
+import { applyFormat, type FieldFormat } from '../composables/use-field';
+
 const [name, bem] = createNamespace('field');
 
-type DividerTypes = "all" | "prefix" | "suffix";
+type DividerTypes = 'all' | 'prefix' | 'suffix';
 
 // provide to Search component to inherit
 export const fieldSharedProps = {
   id: String,
   value: [Number, String],
-  name: String
+  name: String,
 };
 
 export const fieldProps = extend({}, fieldSharedProps, {
-
   type: {
     type: String,
     default: 'text',
@@ -73,7 +67,7 @@ export const fieldProps = extend({}, fieldSharedProps, {
   suffixStyle: Object,
   divider: {
     type: String as PropType<DividerTypes>,
-    default: undefined
+    default: undefined,
   },
   ignores: {
     type: Array as PropType<string[]>,
@@ -111,95 +105,90 @@ export default defineComponent({
 
   setup(props, { emit, slots, attrs }) {
     var ie;
-    const o = ref(!1),
-      i = ref(!1),
-      c = shallowRef<any>({
+    const { parent } = useParent<any>(FORM_KEY);
+    const o = ref(false),
+      i = ref(false),
+      inputPosition = shallowRef<any>({
         selection: null,
-        valueLength: void 0,
+        valueLength: undefined,
       }),
-      l = ref<any>(null);
+      inputEl = ref<any>(null);
     let u: any = null;
-    const d = ref(!1),
-      r = () => {
-        let D: any;
-        return (D = l.value) == null ? void 0 : D.value;
-      },
-      f = (D = '') => {
+    const getInputValue = () => {
+      return inputEl.value?.value;
+    };
+    const isStop = ref(false),
+      resetSelection = (D = '') => {
         var W, ee;
-        if (!l.value) return;
-        const { selectionStart: I, selectionEnd: G } = l.value;
+        if (!inputEl.value) return;
+        const { selectionStart: I, selectionEnd: G } = inputEl.value;
         if (isNotNull(I) && isNotNull(G) && o.value) {
           const Te =
-            ((W = c.value.selection) != null ? W : 0) -
-            (((ee = c.value.valueLength) != null ? ee : 0) - D.length);
-          l.value.setSelectionRange(Te, Te);
+            ((W = inputPosition.value.selection) != null ? W : 0) -
+            (((ee = inputPosition.value.valueLength) != null ? ee : 0) -
+              D.length);
+          inputEl.value.setSelectionRange(Te, Te);
         }
       },
-      m = (D = '', I = 'input') => {
-        if (l.value) {
-          const { selectionStart: G } = l.value;
-          I !== 'input'
-            ? ((l.value.value = D), f(D))
-            : (c.value = {
-                selection: G,
-                valueLength: D.length,
-              });
+      changeValue = (value = '', el = 'input') => {
+        if (inputEl.value) {
+          const { selectionStart } = inputEl.value;
+          if (el !== 'input') {
+            inputEl.value.value = value;
+            resetSelection(value);
+          } else {
+            inputPosition.value = {
+              selection: selectionStart,
+              valueLength: value.length,
+            };
+          }
         }
-        D !== props.value
-          ? (emit('update:value', D),
-            nextTick(() => {
-              var G;
-              if (
-                (emit('change', D),
-                d.value &&
-                  ((G = g == null ? void 0 : g.onChildChange) == null ||
-                    G.call(g, props.value)),
-                (d.value = !0),
-                l.value)
-              ) {
-                const W = props.value ? String(props.value) : '';
-                l.value.value !== W && ((l.value.value = W), f(l.value.value));
+        if (value !== props.value) {
+          if (parent?.format) {
+            value = applyFormat(value, parent?.format);
+          }
+          emit('update:value', value);
+          nextTick(() => {
+            emit('change', value);
+            isStop.value && parent?.onChildChange?.(props.value);
+            isStop.value = true;
+            if (inputEl.value) {
+              const oldValue = props.value ? String(props.value) : '';
+              if (inputEl.value.value !== oldValue) {
+                inputEl.value.value = oldValue;
+                resetSelection(inputEl.value.value);
               }
-            }))
-          : (d.value = !0);
+            }
+          });
+        } else {
+          isStop.value = true;
+        }
       },
-      y = () => {
-        m(isNotNull(props.value) ? String(props.value) : '', 'parent');
+      initValue = () => {
+        changeValue(
+          isNotNull(props.value) ? String(props.value) : '',
+          'parent',
+        );
       };
-    (watch(
+    watch(
       () => props.value,
       (D) => {
-        var I;
-        D !== r() &&
-          (y(),
-          (I = g == null ? void 0 : g.onChildChange) == null ||
-            I.call(g, props.value));
+        if (D !== getInputValue()) {
+          initValue();
+          parent?.onChildChange?.(props.value);
+        }
       },
-    ),
-      onMounted(() => {
+    );
+    onMounted(() => {
+      initValue();
+      parent?.onInitValue?.(props.value);
+    });
+    const isRequired = computed(() => parent?.required || props.required),
+      showStar = computed(() => {
         var D;
-        (y(),
-          (D = g == null ? void 0 : g.onInitValue) == null ||
-            D.call(g, props.value));
-      }));
-    const { parent: g } = useParent<any>(FORM_KEY);
-    (ie = g == null ? void 0 : g.onInitValue) == null ||
-      ie.call(g, props.value);
-    const v = computed(() => {
-        var D, I;
-        return !!((I =
-          (D = g == null ? void 0 : g.required) == null ? void 0 : D.value) !=
-        null
-          ? I
-          : props.required);
-      }),
-      b = computed(() => {
-        var D;
-        return isNotNull(
-          (D = g == null ? void 0 : g.showStarSign) == null ? void 0 : D.value,
-        )
-          ? g.showStarSign.value
-          : props.showStarSign && v.value;
+        return isNotNull(parent?.showStarSign)
+          ? parent?.showStarSign.value
+          : props.showStarSign && isRequired.value;
       }),
       _ = computed(() => props.clearable && props.value && o.value),
       h = ref(!1);
@@ -210,20 +199,18 @@ export default defineComponent({
         props.disabled ||
           ((h.value = !h.value), emit('update:visiblePassword', h.value));
       },
-      P = (D: any) => {
-        var I;
-        (emit('blur', D),
-          (I = g == null ? void 0 : g.onChildBlur) == null ||
-            I.call(g, props.value),
-          (u = setTimeout(() => {
-            o.value = !1;
-          }, 300)));
+      onBlur = (D: any) => {
+        emit('blur', D);
+        parent?.onChildBlur?.(props.value);
+        setTimeout(() => {
+          o.value = false;
+        }, 300);
       },
       O = (D: any) => {
-        (u && clearTimeout(u), emit('focus', D), (o.value = !0));
+        (u && clearTimeout(u), emit('focus', D), (o.value = true));
       },
-      N = () => {
-        i.value || m(r(), 'input');
+      onInput = () => {
+        i.value || changeValue(getInputValue(), 'input');
       },
       A = (D: any) => {
         var G;
@@ -243,19 +230,22 @@ export default defineComponent({
           useClipboard().then((I: any) => {
             var G;
             if (I) {
-              if (l.value && props.ignores)
+              if (inputEl.value && props.ignores)
                 for (const W of props.ignores)
-                  l.value.value =
-                    (G = l.value) == null ? void 0 : G.value.replaceAll(W, '');
-              m(r(), 'input');
+                  inputEl.value.value =
+                    (G = inputEl.value) == null
+                      ? void 0
+                      : G.value.replaceAll(W, '');
+              changeValue(getInputValue(), 'input');
             }
           });
       },
       E = () => {
-        i.value = !0;
+        i.value = true;
       },
       S = () => {
-        ((i.value = !1), N());
+        i.value = false;
+        onInput();
       },
       B = computed(() =>
         props.type === 'password'
@@ -274,21 +264,20 @@ export default defineComponent({
         ).find(Boolean);
       }),
       M = (D: any) => {
-        var I;
-        (emit('update:value', ''),
-          emit('clear', D),
-          (I = l.value) == null || I.focus());
+        emit('update:value', '');
+        emit('clear', D);
+        inputEl.value?.focus();
       };
     useExpose({
       focus() {
-        l.value && l.value.focus();
+        inputEl.value && inputEl.value.focus();
       },
       blur() {
-        l.value && l.value.blur();
+        inputEl.value && inputEl.value.blur();
       },
-      $input: l,
+      $input: inputEl,
     });
-    const H = () => {
+    const createInputElement = () => {
       const D = props.type === 'textarea' ? 'textarea' : 'input';
       return createVNode(
         'section',
@@ -299,7 +288,7 @@ export default defineComponent({
           createVNode(
             D,
             mergeProps(attrs, {
-              ref: l,
+              ref: inputEl,
               spellcheck: 'false',
               size: 1,
               type: B.value,
@@ -307,9 +296,9 @@ export default defineComponent({
               disabled: props.disabled,
               class: [bem('input'), props.inputClass],
               style: props.inputStyle,
-              onInput: N,
-              onChange: S,
-              onBlur: P,
+              onInput: onInput,
+              //onChange: S,
+              onBlur: onBlur,
               onFocus: O,
               onKeydown: A,
               onPaste: T,
@@ -335,7 +324,12 @@ export default defineComponent({
         {(slots.prefix || props.prefixIcon) && (
           <span
             style={props.prefixStyle}
-            class={props.divider && (props.divider === 'all' || props.divider === 'prefix') ? '' : bem('prefix')}
+            class={
+              props.divider &&
+              (props.divider === 'all' || props.divider === 'prefix')
+                ? 'prefix__has_divider'
+                : bem('prefix')
+            }
             onClick={() => emit('clickPrefix')}
           >
             {slots.prefix ? (
@@ -345,16 +339,39 @@ export default defineComponent({
             )}
           </span>
         )}
-        {props.divider && (props.divider === 'all' || props.divider === 'prefix') && <Divider vertical />}
+        {props.divider &&
+          (props.divider === 'all' || props.divider === 'prefix') && (
+            <Divider vertical />
+          )}
         <section class={bem('input-wrap')}>
-          {b.value && <span class={bem('star-sign')}>*</span>}
-          {H()}
+          {showStar.value && <span class={bem('star-sign')}>*</span>}
+          {createInputElement()}
         </section>
-        {props.divider && (props.divider === 'all' || props.divider === 'suffix') && <Divider vertical />}
-        <section class={bem('suffix', props.divider && (props.divider === 'all' || props.divider === 'suffix') ? '' : 'padding')}>
+        {props.divider &&
+          (props.divider === 'all' || props.divider === 'suffix') && (
+            <Divider vertical />
+          )}
+        <section
+          class={bem(
+            'suffix',
+            props.divider &&
+              (props.divider === 'all' || props.divider === 'suffix')
+              ? 'suffix__has_divider'
+              : 'padding',
+          )}
+        >
           {_.value && (
             <span onClick={M} class={[bem('suffix-icon'), bem('clear')]}>
-              <Icon name={'/lobby_asset/common/web/common/comm_icon_qc.svg'} />
+              <Icon
+                name={
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 30 30">\n' +
+                  '  <g id="5c32be7db9d04da7291cf2c0956b8814-comm_icon_qc" transform="translate(19859 11386)">\n' +
+                  '    <rect id="5c32be7db9d04da7291cf2c0956b8814-矩形_28770" data-name="矩形 28770" width="30" height="30" transform="translate(-19859 -11386)" fill="#fff" opacity="0"/>\n' +
+                  '    <path id="5c32be7db9d04da7291cf2c0956b8814-清空" d="M3323,1936a14,14,0,1,1,9.9-4.1A14,14,0,0,1,3323,1936Zm0-12.35h0l4.536,4.537a1.167,1.167,0,1,0,1.65-1.65l-4.537-4.536,4.537-4.537a1.167,1.167,0,1,0-1.65-1.65l-4.536,4.536-4.538-4.536a1.167,1.167,0,0,0-1.65,1.651l4.538,4.536-4.538,4.537a1.167,1.167,0,1,0,1.65,1.65l4.537-4.537Z" transform="translate(-23167 -13292.998)" fill="#999"/>\n' +
+                  '  </g>\n' +
+                  '<script xmlns=""/></svg>'
+                }
+              />
             </span>
           )}
           {props.showEye && (

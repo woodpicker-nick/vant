@@ -7,14 +7,11 @@ import {
   type PropType,
   watch,
 } from 'vue';
-import {
-  FORM_KEY,
-  createNamespace,
-} from '../utils';
+import { FORM_KEY, createNamespace } from '../utils';
 import { useParent, useChildren } from '@vant/use';
 import type { FormProvide } from '../form/types';
 import { useFieldExplain } from '../composables/use-field-explain';
-import { useField } from 'vee-validate';
+import { type FieldFormat, useField } from "../composables/use-field";
 import { useExpose } from '../composables/use-expose';
 import Icon from '../icon';
 
@@ -54,25 +51,36 @@ export const formItemProps = {
     type: Boolean,
     default: void 0,
   },
-  required: {
-    type: Boolean,
-  },
   showRequired: {
     type: Boolean,
-    default: !0,
+    default: false,
   },
   requiredInDepLabel: Boolean,
   showHelpIcon: {
     type: Boolean,
-    default: !0,
+    default: true,
   },
   showExplainIcon: {
     type: Boolean,
-    default: !0,
+    default: true,
   },
   showErrorIcon: {
     type: Boolean,
-    default: !0,
+    default: true,
+  },
+  format: {
+    type: Object as PropType<FieldFormat<any>>,
+  },
+  validateOnValueUpdate: {
+    type: Boolean,
+    default: false,
+  },
+  validateOnMount: {
+    type: Boolean,
+    default: false,
+  },
+  initialValue: {
+    type: Object as PropType<any>,
   },
 };
 
@@ -87,76 +95,82 @@ export default defineComponent({
   props: formItemProps,
   setup(props, { emit, slots }) {
     const { linkChildren } = useChildren<any>(FORM_KEY),
-      { parent: s } = useParent<any>(FORM_KEY),
+      { parent } = useParent<any>(FORM_KEY),
       i = inject<any>(FORM_ITEM_COMMON_PROPS_KEY) || {},
-      c = (h: any) =>
+      haveTrigger = (h: any) =>
         (Array.isArray(props.validateTrigger)
           ? props.validateTrigger
           : [props.validateTrigger]
         ).includes(h),
       l = computed(() => {
-        var h;
-        return (h = s == null ? void 0 : s.layout) != null ? h : props.layout;
+        return parent?.layout || props.layout;
       }),
       u = computed(() => {
-        var h;
-        return (h = s == null ? void 0 : s.labelWidth) != null
-          ? h
-          : props.labelWidth;
+        return parent?.labelWidth || props.labelWidth;
       }),
       d = useFieldExplain(props.name),
+      rules = computed(() => props.rules),
       {
-        value: r,
-        validate: f,
-        errorMessage: m,
+        value,
+        validate,
+        errorMessage,
         meta: y,
         resetField: g,
-      } = useField<any>(props.name as string, props.rules, {
+      } = useField(props.name as string, rules, {
         validateOnMount: false,
-        validateOnValueUpdate: false,
+        validateOnValueUpdate: props.validateOnValueUpdate,
+        //format: props.format,
+        initialValue: props.initialValue,
       });
     watch(
-      () => r.value,
+      () => value.value,
       () => {
         let h, R;
         (R = (h = d.value).setFieldError) == null || R.call(h, props.name);
       },
     );
-    const v = (h: any, R?: any) => {
-      ((r.value = h),
-        R &&
-          c(R) &&
-          (props.delayValidateTrigger
-            ? setTimeout(f, props.delayValidateTrigger)
-            : f()));
+    const triggerFun = (h: any, eventName?: any) => {
+      value.value = h;
+      if (eventName && haveTrigger(eventName)) {
+        props.delayValidateTrigger
+          ? setTimeout(validate, props.delayValidateTrigger)
+          : validate();
+      }
     };
-    (linkChildren({
+    const required = computed(() => {
+      const currentRules = props.rules;
+      return (
+        Array.isArray(currentRules) &&
+        currentRules.some((rule) => rule?.required === true)
+      );
+    });
+
+    linkChildren({
       name: props.name,
-      required: computed(() => props.required),
+      required: computed(() => required.value),
       showStarSign: computed(
         () =>
-          props.required &&
+          required.value && props.showRequired &&
           (props.requiredInDepLabel || i.requiredInDepLabel
-            ? !0
+            ? true
             : !props.label),
       ),
-      onChildChange: (h: any) => v(h, 'onChange'),
-      onChildBlur: (h: any) => v(h, 'onBlur'),
-      onInitValue: (h: any) => v(h),
-    }),
-      useExpose({
-        validate: f,
-        meta: y,
-        clearValidate: g,
-      }));
-    const b = (h: any, R: boolean, P: any) => {
+      onChildChange: (h: any) => triggerFun(h, 'onChange'),
+      onChildBlur: (h: any) => triggerFun(h, 'onBlur'),
+      onInitValue: (h: any) => triggerFun(h),
+      format: props.format
+    });
+    useExpose({
+      validate: validate,
+      meta: y,
+      clearValidate: g,
+    });
+    const message = (h: any, R: boolean, P: any) => {
         const O = i.icons || {},
           N = {
-            success:
-              O.success || 'success',
+            success: O.success || 'success',
             warn: O.warn || 'fail',
-            error:
-              O.error || 'fail',
+            error: O.error || 'fail',
           };
         if (!P()) return;
         const A = typeof P() != 'string';
@@ -183,7 +197,9 @@ export default defineComponent({
       },
       _ = computed(() => {
         const { type: h, message: R } = d.value;
-        return !!m.value || (h === 'error' && (R == null ? void 0 : R()));
+        return (
+          !!errorMessage.value || (h === 'error' && (R == null ? void 0 : R()))
+        );
       });
     return () => (
       <section
@@ -191,7 +207,7 @@ export default defineComponent({
           [props.name as string]: !0,
           style: !props.noStyle,
           horizontal: l.value === 'horizontal',
-          required: props.required,
+          required: required.value,
           'has-error': _.value,
         })}
         data-item-name={props.name}
@@ -203,7 +219,7 @@ export default defineComponent({
               width: l.value === 'horizontal' ? u.value : 'auto',
             }}
           >
-            {props.required && props.showRequired && (
+            {required.value && props.showRequired && (
               <span class={bem('required-sign')}>*</span>
             )}
             <span class={[bem('label-text')]}>
@@ -216,23 +232,20 @@ export default defineComponent({
             [props.name as string]: true,
             style: !props.noStyle,
             horizontal: l.value === 'horizontal',
-            required: props.required,
+            required: required.value,
             'has-error': _.value,
           })}
           data-item-name={props.name}
         >
-          <section class={bem('content', { error: m.value })}>
+          <section class={bem('content', { error: errorMessage.value })}>
             <section class={bem('input')}>{slots.default?.()}</section>
             {
               [
-                b('error', props.showErrorIcon, () => m.value),
-                b(d.value.type, props.showExplainIcon, () => {
-                  var R, P;
-                  return (P = (R = d.value).message) == null
-                    ? void 0
-                    : P.call(R);
+                message('error', props.showErrorIcon, () => errorMessage.value),
+                message(d.value.type, props.showExplainIcon, () => {
+                  d.value?.message?.();
                 }),
-                b('warn', props.showHelpIcon, () => props.help),
+                message('warn', props.showHelpIcon, () => props.help),
               ].filter(Boolean)[0]
             }
           </section>

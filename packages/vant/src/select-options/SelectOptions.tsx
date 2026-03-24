@@ -28,7 +28,6 @@ export const selectOptionsProps = {
     type: Boolean,
     default: !0,
   },
-
   option: {
     type: Object,
   },
@@ -36,6 +35,7 @@ export const selectOptionsProps = {
   label: String,
   icon: String,
   disabled: Boolean,
+  data: Object as Record<string, any>,
   mode: {
     type: String,
     default: 'single',
@@ -64,7 +64,8 @@ export default defineComponent({
           value: props.value,
           label: props.label,
           icon: props.icon,
-          disabled: props.disabled
+          disabled: props.disabled,
+          data: props.data
         })
       }
       , c = (u: any) => {

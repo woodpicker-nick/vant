@@ -10,7 +10,8 @@ export type FormExpose = {
   setErrors: (fields: any) => void;
   setFieldValue: (name?: any, shouldValidate?:boolean) => void;
   setValues: (fields: any) => void;
-  errors: ComputedRef<Partial<Record<string, string | undefined>>>;
+  errors: Record<string, string>;
+  clearErrors: () => void;
   // getValues: () => Record<string, unknown>;
   // scrollToField: (
   //   name: string,

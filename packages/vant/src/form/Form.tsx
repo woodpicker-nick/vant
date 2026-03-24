@@ -1,4 +1,4 @@
-import { defineComponent, type ExtractPropTypes } from 'vue';
+import { defineComponent, type ExtractPropTypes, type PropType } from 'vue';
 
 // Utils
 import { FORM_KEY, createNamespace } from '../utils';
@@ -6,9 +6,8 @@ import { FORM_KEY, createNamespace } from '../utils';
 // Composables
 import { useChildren } from '@vant/use';
 import { useExpose } from '../composables/use-expose';
-
+import { useForm } from '../composables/use-form';
 import type { FormExpose } from './types';
-import { useForm } from 'vee-validate';
 
 const [name, bem] = createNamespace('form');
 
@@ -21,8 +20,8 @@ export const formProps = {
     type: String,
   },
   model: {
-    type: Object,
-    required: !0,
+    type: Object as PropType<Record<string, any>>,
+    required: true
   },
   scrollToError: Boolean,
 };
@@ -55,8 +54,10 @@ export default defineComponent({
       errors,
       handleSubmit,
       validateField,
+      clearErrors,
     } = useForm({
-      initialValues: props.model,
+      initialValues: props.model as Record<string, any>,
+      validateOnMount: false
     });
 
     const onSubmit = () => {
@@ -72,9 +73,10 @@ export default defineComponent({
       setFieldValue,
       setValues,
       errors,
+      clearErrors,
       submit: async () => {
         await validate();
-        if (meta.value.valid) onSubmit();
+        if (meta.valid.value) onSubmit();
         else if (props.scrollToError) {
           const el = document.querySelector(
             '.van-form-item__explain[data-formitem-error="true"]',

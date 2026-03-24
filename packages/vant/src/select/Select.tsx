@@ -21,8 +21,8 @@ import {
   isNull,
   addUnit,
   isNotVueObject,
-  makeStringProp,
-} from '../utils';
+  makeStringProp, FORM_KEY,
+} from "../utils";
 import { useChildren, useClickAway, useParent } from '@vant/use';
 import { useId } from '../composables/use-id';
 import get from 'lodash-es/get';
@@ -232,6 +232,8 @@ export default defineComponent({
       };
     }
 
+    const { parent } = useParent<any>(FORM_KEY);
+
     const o = ref(!1),
       a = ref(),
       r = ref(),
@@ -243,7 +245,6 @@ export default defineComponent({
       d = ref<any[]>([]),
       f = ref(''),
       { children: h, linkChildren } = useChildren(SELECT_KEY),
-      { parent: m } = useParent<any>(Symbol('form')),
       p = useId(),
       _ = ref(),
       //, {isRTL: b} = UL()
@@ -259,7 +260,7 @@ export default defineComponent({
         var z, ee;
         return (
           !!((ee =
-            (z = m == null ? void 0 : m.required) == null ? void 0 : z.value) !=
+            (z = parent == null ? void 0 : parent.required) == null ? void 0 : z.value) !=
           null
             ? ee
             : props.required) && props.showStarSign
@@ -297,7 +298,7 @@ export default defineComponent({
       G = computed(() =>
         Xv(d.value, f.value, props.filterKey, V, props.searchCaseSensitive),
       ),
-      q = computed({
+      modelValue = computed({
         get() {
           const { modelValue: z, mode: ee } = props,
             ae = ee === 'multiple',
@@ -309,15 +310,14 @@ export default defineComponent({
         },
       });
     watch(
-      () => q.value,
+      () => modelValue.value,
       (z) => {
-        U(z);
+        updateValue(z);
       },
     );
 
-    const U = (z: any) => {
-        var ee;
-        (ee = m == null ? void 0 : m.onChildChange) == null || ee.call(m, z);
+    const updateValue = (z: any) => {
+        parent?.onChildChange?.(z);
       },
       E = ref(),
       j = (z: any) => {
@@ -335,10 +335,10 @@ export default defineComponent({
           : ne;
       };
     watch(
-      () => q.value,
+      () => modelValue.value,
       (z, ee) => {
         var ae;
-        ((ae = m == null ? void 0 : m.onInitValue) == null || ae.call(m, z),
+        ((ae = parent == null ? void 0 : parent.onInitValue) == null || ae.call(parent, z),
           z !== ee && j(z));
       },
       {
@@ -348,14 +348,14 @@ export default defineComponent({
     );
 
     const W = computed(() =>
-        isNull(q.value) ? -1 : h.findIndex((z) => z.value === q.value),
+        isNull(modelValue.value) ? -1 : h.findIndex((z) => z.value === modelValue.value),
       ),
       K = computed(() => ({
         width: addUnit(props.width),
         maxHeight: addUnit(props.maxHeight),
       })),
       ie = () => {
-        ((q.value = void 0), (E.value = void 0));
+        ((modelValue.value = void 0), (E.value = void 0));
       },
       Y = computed(() => !!(props.allowClear && E.value && o.value));
 
@@ -395,8 +395,8 @@ export default defineComponent({
         ae = (ke: any) => {
           var Ge;
           (props.isSearchingTriggerValueChange &&
-            ((Ge = m == null ? void 0 : m.onChildChange) == null ||
-              Ge.call(m, ke)),
+            ((Ge = parent == null ? void 0 : parent.onChildChange) == null ||
+              Ge.call(parent, ke)),
             emit('search', ke),
             props.showSearch && (f.value = ke));
         },
@@ -475,7 +475,7 @@ export default defineComponent({
               }),
             ]),
       te = (z: any, ee: any) => {
-        ((q.value = ee.value),
+        ((modelValue.value = ee.value),
           props.mode === 'single' && emit('selected', ee),
           P.value && Z(),
           r.value !== ee.value && emit('change', ee));
@@ -506,7 +506,7 @@ export default defineComponent({
             o.value ||
               (ie(),
               nextTick(() => {
-                ((q.value = ne), j(ne));
+                ((modelValue.value = ne), j(ne));
               }));
           },
           ae = () => {
