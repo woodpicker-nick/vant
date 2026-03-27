@@ -223,7 +223,9 @@ export default defineComponent({
       const optionStyle = {
         height: `${props.optionHeight}px`,
       };
-
+      const selectedIndex = props.options.findIndex(
+        (_) => _[props.fields.value] === props.value,
+      );
       return props.options.map((option, index) => {
         const text = option[props.fields.text];
         const { disabled } = option;
@@ -235,6 +237,8 @@ export default defineComponent({
           class: [
             bem('item', {
               disabled,
+              prev2: Number(selectedIndex - 2) === index,
+              prev: Number(selectedIndex - 1) === index,
               selected: value === props.value,
             }),
             option.className,
@@ -248,7 +252,7 @@ export default defineComponent({
         };
 
         return (
-          <li {...data}>
+          <li {...data} key={'pickColumn_option_' + index}>
             {slots.option ? (
               slots.option(option, index)
             ) : (

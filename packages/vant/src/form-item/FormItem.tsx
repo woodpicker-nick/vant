@@ -11,7 +11,7 @@ import { FORM_KEY, createNamespace } from '../utils';
 import { useParent, useChildren } from '@vant/use';
 import type { FormProvide } from '../form/types';
 import { useFieldExplain } from '../composables/use-field-explain';
-import { type FieldFormat, useField } from "../composables/use-field";
+import { type FieldFormat, useField } from '../composables/use-field';
 import { useExpose } from '../composables/use-expose';
 import Icon from '../icon';
 
@@ -93,7 +93,7 @@ export const FORM_ITEM_COMMON_PROPS_KEY: InjectionKey<FormProvide> = Symbol(
 export default defineComponent({
   name,
   props: formItemProps,
-  setup(props, { emit, slots }) {
+  setup(props, { slots }) {
     const { linkChildren } = useChildren<any>(FORM_KEY),
       { parent } = useParent<any>(FORM_KEY),
       i = inject<any>(FORM_ITEM_COMMON_PROPS_KEY) || {},
@@ -150,7 +150,8 @@ export default defineComponent({
       required: computed(() => required.value),
       showStarSign: computed(
         () =>
-          required.value && props.showRequired &&
+          required.value &&
+          props.showRequired &&
           (props.requiredInDepLabel || i.requiredInDepLabel
             ? true
             : !props.label),
@@ -158,7 +159,7 @@ export default defineComponent({
       onChildChange: (h: any) => triggerFun(h, 'onChange'),
       onChildBlur: (h: any) => triggerFun(h, 'onBlur'),
       onInitValue: (h: any) => triggerFun(h),
-      format: props.format
+      format: props.format,
     });
     useExpose({
       validate: validate,
@@ -227,28 +228,17 @@ export default defineComponent({
             </span>
           </span>
         )}
-        <section
-          class={bem({
-            [props.name as string]: true,
-            style: !props.noStyle,
-            horizontal: l.value === 'horizontal',
-            required: required.value,
-            'has-error': _.value,
-          })}
-          data-item-name={props.name}
-        >
-          <section class={bem('content', { error: errorMessage.value })}>
-            <section class={bem('input')}>{slots.default?.()}</section>
-            {
-              [
-                message('error', props.showErrorIcon, () => errorMessage.value),
-                message(d.value.type, props.showExplainIcon, () => {
-                  d.value?.message?.();
-                }),
-                message('warn', props.showHelpIcon, () => props.help),
-              ].filter(Boolean)[0]
-            }
-          </section>
+        <section class={bem('content', { error: errorMessage.value })}>
+          <section class={bem('input')}>{slots.default?.()}</section>
+          {
+            [
+              message('error', props.showErrorIcon, () => errorMessage.value),
+              message(d.value.type, props.showExplainIcon, () => {
+                d.value?.message?.();
+              }),
+              message('warn', props.showHelpIcon, () => props.help),
+            ].filter(Boolean)[0]
+          }
         </section>
       </section>
     );

@@ -44,6 +44,9 @@ export const datePickerProps = extend({}, sharedProps, {
     default: () => new Date(currentYear + 10, 11, 31),
     validator: isDate,
   },
+  selectedDate: {
+    type: Date,
+  },
 });
 
 export type DatePickerExpose = {
@@ -195,9 +198,30 @@ export default defineComponent({
       },
     );
 
-    const onChange = (...args: unknown[]) => emit('change', ...args);
+    const selectedData = (args: any[]) => {
+      if (props.columnsType.length === 3 && args?.length > 0) {
+        let year, mouth, day;
+        if (props.columnsType[0] === 'day') {
+          [day, mouth, year] = args[0].selectedValues;
+        } else if (props.columnsType[0] === 'month') {
+          [mouth, day, year] = args[0].selectedValues;
+        } else {
+          [year, mouth, day] = args[0].selectedValues;
+        }
+        args[0].selectedDate = new Date(
+          Number(year),
+          Number(mouth) - 1,
+          Number(day),
+        );
+      }
+      return args;
+    };
+
+    const onChange = (...args: unknown[]) =>
+      emit('change', ...args, ...selectedData(args));
     const onCancel = (...args: unknown[]) => emit('cancel', ...args);
-    const onConfirm = (...args: unknown[]) => emit('confirm', ...args);
+    const onConfirm = (...args: unknown[]) =>
+      emit('confirm', ...selectedData(args));
 
     useExpose<DatePickerExpose>({ confirm, getSelectedDate });
 

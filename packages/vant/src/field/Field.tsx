@@ -2,16 +2,13 @@ import {
   ref,
   shallowRef,
   watch,
-  provide,
   computed,
   nextTick,
-  reactive,
   onMounted,
   defineComponent,
   watchEffect,
   type PropType,
   type ExtractPropTypes,
-  type HTMLAttributes,
   mergeProps,
   h as createVNode,
 } from 'vue';
@@ -31,7 +28,7 @@ import { icons } from './icon';
 
 import { useClipboard } from '../composables/use-clipboard';
 
-import { applyFormat, type FieldFormat } from '../composables/use-field';
+import { applyFormat } from '../composables/use-field';
 
 const [name, bem] = createNamespace('field');
 
@@ -104,72 +101,68 @@ export default defineComponent({
   ],
 
   setup(props, { emit, slots, attrs }) {
-    var ie;
     const { parent } = useParent<any>(FORM_KEY);
-    const o = ref(false),
+    const isInput = ref(false),
       i = ref(false),
       inputPosition = shallowRef<any>({
         selection: null,
         valueLength: undefined,
       }),
       inputEl = ref<any>(null);
-    let u: any = null;
+    const u: any = null;
     const getInputValue = () => {
       return inputEl.value?.value;
     };
-    const isStop = ref(false),
-      resetSelection = (D = '') => {
-        var W, ee;
-        if (!inputEl.value) return;
-        const { selectionStart: I, selectionEnd: G } = inputEl.value;
-        if (isNotNull(I) && isNotNull(G) && o.value) {
-          const Te =
-            ((W = inputPosition.value.selection) != null ? W : 0) -
-            (((ee = inputPosition.value.valueLength) != null ? ee : 0) -
-              D.length);
-          inputEl.value.setSelectionRange(Te, Te);
-        }
-      },
-      changeValue = (value = '', el = 'input') => {
-        if (inputEl.value) {
-          const { selectionStart } = inputEl.value;
-          if (el !== 'input') {
-            inputEl.value.value = value;
-            resetSelection(value);
-          } else {
-            inputPosition.value = {
-              selection: selectionStart,
-              valueLength: value.length,
-            };
-          }
-        }
-        if (value !== props.value) {
-          if (parent?.format) {
-            value = applyFormat(value, parent?.format);
-          }
-          emit('update:value', value);
-          nextTick(() => {
-            emit('change', value);
-            isStop.value && parent?.onChildChange?.(props.value);
-            isStop.value = true;
-            if (inputEl.value) {
-              const oldValue = props.value ? String(props.value) : '';
-              if (inputEl.value.value !== oldValue) {
-                inputEl.value.value = oldValue;
-                resetSelection(inputEl.value.value);
-              }
-            }
-          });
+    const isStop = ref(false);
+    const resetSelection = (D = '') => {
+      let W, ee;
+      if (!inputEl.value) return;
+      const { selectionStart: I, selectionEnd: G } = inputEl.value;
+      if (isNotNull(I) && isNotNull(G) && isInput.value) {
+        const Te =
+          ((W = inputPosition.value.selection) != null ? W : 0) -
+          (((ee = inputPosition.value.valueLength) != null ? ee : 0) -
+            D.length);
+        inputEl.value.setSelectionRange(Te, Te);
+      }
+    };
+    const changeValue = (value = '', el = 'input') => {
+      if (inputEl.value) {
+        const { selectionStart } = inputEl.value;
+        if (el !== 'input') {
+          inputEl.value.value = value;
+          resetSelection(value);
         } else {
-          isStop.value = true;
+          inputPosition.value = {
+            selection: selectionStart,
+            valueLength: value.length,
+          };
         }
-      },
-      initValue = () => {
-        changeValue(
-          isNotNull(props.value) ? String(props.value) : '',
-          'parent',
-        );
-      };
+      }
+      if (value !== props.value) {
+        if (parent?.format) {
+          value = applyFormat(value, parent?.format);
+        }
+        emit('update:value', value);
+        nextTick(() => {
+          emit('change', value);
+          isStop.value && parent?.onChildChange?.(props.value);
+          isStop.value = true;
+          if (inputEl.value) {
+            const oldValue = props.value ? String(props.value) : '';
+            if (inputEl.value.value !== oldValue) {
+              inputEl.value.value = oldValue;
+              resetSelection(inputEl.value.value);
+            }
+          }
+        });
+      } else {
+        isStop.value = true;
+      }
+    };
+    const initValue = () => {
+      changeValue(isNotNull(props.value) ? String(props.value) : '', 'parent');
+    };
     watch(
       () => props.value,
       (D) => {
@@ -183,37 +176,41 @@ export default defineComponent({
       initValue();
       parent?.onInitValue?.(props.value);
     });
-    const isRequired = computed(() => parent?.required || props.required),
-      showStar = computed(() => {
-        var D;
-        return isNotNull(parent?.showStarSign)
-          ? parent?.showStarSign.value
-          : props.showStarSign && isRequired.value;
-      }),
-      _ = computed(() => props.clearable && props.value && o.value),
-      h = ref(!1);
-    watchEffect(() => {
-      props.visiblePassword !== void 0 && (h.value = !!props.visiblePassword);
+    const isRequired = computed(() => parent?.required || props.required);
+    const showClear = computed(() => {
+      return props.clearable && !!props.value && isInput.value;
     });
-    const R = () => {
+    const showStar = computed(() => {
+      return isNotNull(parent?.showStarSign)
+        ? parent?.showStarSign.value
+        : props.showStarSign && isRequired.value;
+    });
+    const visiblePassword = ref(false);
+    watchEffect(() => {
+      props.visiblePassword !== void 0 &&
+        (visiblePassword.value = !!props.visiblePassword);
+    });
+    const updateVisiblePassword = () => {
         props.disabled ||
-          ((h.value = !h.value), emit('update:visiblePassword', h.value));
+          ((visiblePassword.value = !visiblePassword.value),
+          emit('update:visiblePassword', visiblePassword.value));
       },
       onBlur = (D: any) => {
         emit('blur', D);
         parent?.onChildBlur?.(props.value);
         setTimeout(() => {
-          o.value = false;
+          isInput.value = false;
         }, 300);
       },
-      O = (D: any) => {
-        (u && clearTimeout(u), emit('focus', D), (o.value = true));
+      onFocus = (D: any) => {
+        (u && clearTimeout(u), emit('focus', D), (isInput.value = true));
       },
       onInput = () => {
+        if (!isInput.value) isInput.value = true;
         i.value || changeValue(getInputValue(), 'input');
       },
       A = (D: any) => {
-        var G;
+        let G;
         const I = D.key.toLocaleLowerCase();
         I &&
           props.type === 'number' &&
@@ -223,12 +220,12 @@ export default defineComponent({
           D.preventDefault();
       },
       T = () => {
-        var D;
+        let D;
         props.type === 'number' &&
           (D = props.ignores) != null &&
           D.length &&
           useClipboard().then((I: any) => {
-            var G;
+            let G;
             if (I) {
               if (inputEl.value && props.ignores)
                 for (const W of props.ignores)
@@ -249,7 +246,7 @@ export default defineComponent({
       },
       B = computed(() =>
         props.type === 'password'
-          ? h.value
+          ? visiblePassword.value
             ? 'text'
             : 'password'
           : props.type,
@@ -258,12 +255,12 @@ export default defineComponent({
         // const D = (I: any) =>
         //   `/lobby_asset/common/web/common/comm_icon_${I}.svg`;
         return (
-          h.value
+          visiblePassword.value
             ? [props.eyeOpenIcon, 'eye']
             : [props.eyeCloseIcon, icons.hideEye]
         ).find(Boolean);
       }),
-      M = (D: any) => {
+      clear = (D: any) => {
         emit('update:value', '');
         emit('clear', D);
         inputEl.value?.focus();
@@ -299,7 +296,7 @@ export default defineComponent({
               onInput: onInput,
               //onChange: S,
               onBlur: onBlur,
-              onFocus: O,
+              onFocus: onFocus,
               onKeydown: A,
               onPaste: T,
               onCompositionend: S,
@@ -317,7 +314,7 @@ export default defineComponent({
             disabled: props.disabled,
           }),
           props.class,
-          o.value ? 'input-focus' : '',
+          isInput.value ? 'input-focus' : '',
         ]}
         style={props.style}
       >
@@ -360,8 +357,8 @@ export default defineComponent({
               : 'padding',
           )}
         >
-          {_.value && (
-            <span onClick={M} class={[bem('suffix-icon'), bem('clear')]}>
+          {showClear.value && (
+            <span onClick={clear} class={[bem('suffix-icon'), bem('clear')]}>
               <Icon
                 name={
                   '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 30 30">\n' +
@@ -379,10 +376,10 @@ export default defineComponent({
               class={[
                 bem('suffix-icon'),
                 bem('eye', {
-                  show: h.value,
+                  show: visiblePassword.value,
                 }),
               ]}
-              onClick={R}
+              onClick={updateVisiblePassword}
             >
               <Icon name={x.value} />
             </span>
