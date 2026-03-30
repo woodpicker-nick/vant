@@ -20,8 +20,10 @@ const [name, bem] = createNamespace('badge');
 
 export type BadgePosition =
   | 'top-left'
+  | 'top-center'
   | 'top-right'
   | 'bottom-left'
+  | 'bottom-center'
   | 'bottom-right';
 
 export const badgeProps = {
@@ -33,6 +35,7 @@ export const badgeProps = {
   content: numericProp,
   showZero: truthProp,
   position: makeStringProp<BadgePosition>('top-right'),
+  html: String
 };
 
 export type BadgeProps = ExtractPropTypes<typeof badgeProps>;
@@ -120,15 +123,21 @@ export default defineComponent({
             ])}
             style={style.value}
           >
-            {renderContent()}
+            <div class={bem("content")}>{renderContent()}</div>
           </div>
         );
       }
     };
 
     return () => {
-      if (slots.default) {
-        const { tag } = props;
+      const { tag } = props;
+      if(props.html) {
+        return (
+          <tag class={bem('wrapper')} v-html={props.html}>
+            {renderBadge()}
+          </tag>
+        );
+      } else if (slots.default) {
         return (
           <tag class={bem('wrapper')}>
             {slots.default()}
@@ -136,7 +145,6 @@ export default defineComponent({
           </tag>
         );
       }
-
       return renderBadge();
     };
   },

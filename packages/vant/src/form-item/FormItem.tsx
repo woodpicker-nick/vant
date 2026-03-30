@@ -114,7 +114,7 @@ export default defineComponent({
         value,
         validate,
         errorMessage,
-        meta: y,
+        meta,
         resetField: g,
       } = useField(props.name as string, rules, {
         validateOnMount: false,
@@ -160,10 +160,11 @@ export default defineComponent({
       onChildBlur: (h: any) => triggerFun(h, 'onBlur'),
       onInitValue: (h: any) => triggerFun(h),
       format: props.format,
+      valid: computed(() => meta.valid.value)
     });
     useExpose({
       validate: validate,
-      meta: y,
+      meta,
       clearValidate: g,
     });
     const message = (h: any, R: boolean, P: any) => {

@@ -57,6 +57,7 @@ export default defineComponent({
           class={[
             classPrefix.value,
             isImageIcon || isSvgIcon ? '' : `${classPrefix.value}-${name}`,
+            isSvgIcon ? bem('svg') : ''
           ]}
           style={{
             color,
@@ -64,13 +65,10 @@ export default defineComponent({
           }}
           content={badge}
           {...props.badgeProps}
+          html={isSvgIcon ? name : undefined}
         >
           {slots.default?.()}
-          {isSvgIcon ? (
-            <i class={bem('svg')} v-html={name}></i>
-          ) : (
-            isImageIcon && <img class={bem('image')} src={name} />
-          )}
+          {(!isSvgIcon && isImageIcon) && <img class={bem('image')} src={name} />}
         </Badge>
       );
     };

@@ -79,6 +79,8 @@ export const fieldProps = extend({}, fieldSharedProps, {
   },
   eyeOpenIcon: String,
   eyeCloseIcon: String,
+  verify: Boolean,
+  trim: Boolean,
 });
 
 export type FieldProps = ExtractPropTypes<typeof fieldProps>;
@@ -102,6 +104,8 @@ export default defineComponent({
 
   setup(props, { emit, slots, attrs }) {
     const { parent } = useParent<any>(FORM_KEY);
+    const isBlur = ref(false);
+    const oldValue = ref('');
     const isInput = ref(false),
       i = ref(false),
       inputPosition = shallowRef<any>({
@@ -142,6 +146,8 @@ export default defineComponent({
       if (value !== props.value) {
         if (parent?.format) {
           value = applyFormat(value, parent?.format);
+        } else if (props.trim) {
+          value = value.replace(' ', '');
         }
         emit('update:value', value);
         nextTick(() => {
@@ -161,7 +167,10 @@ export default defineComponent({
       }
     };
     const initValue = () => {
-      changeValue(isNotNull(props.value) ? String(props.value) : '', 'parent');
+      if(isNotNull(props.value)) {
+        oldValue.value = String(props.value);
+      }
+      changeValue(oldValue.value, 'parent');
     };
     watch(
       () => props.value,
@@ -176,9 +185,14 @@ export default defineComponent({
       initValue();
       parent?.onInitValue?.(props.value);
     });
-    const isRequired = computed(() => parent?.required || props.required);
+    const isRequired = computed(() => parent?.required.value || props.required);
     const showClear = computed(() => {
       return props.clearable && !!props.value && isInput.value;
+    });
+    const showVerified = computed(() => {
+      return (
+        props.verify && !!props.value && oldValue.value !== '' && (props.value !== oldValue.value) && isBlur.value && parent?.valid.value
+      );
     });
     const showStar = computed(() => {
       return isNotNull(parent?.showStarSign)
@@ -200,13 +214,18 @@ export default defineComponent({
         parent?.onChildBlur?.(props.value);
         setTimeout(() => {
           isInput.value = false;
+          isBlur.value = true;
         }, 300);
       },
       onFocus = (D: any) => {
-        (u && clearTimeout(u), emit('focus', D), (isInput.value = true));
+        (u && clearTimeout(u),
+          emit('focus', D),
+          (isInput.value = true),
+          (isBlur.value = false));
       },
       onInput = () => {
         if (!isInput.value) isInput.value = true;
+        isBlur.value = false;
         i.value || changeValue(getInputValue(), 'input');
       },
       A = (D: any) => {
@@ -261,6 +280,7 @@ export default defineComponent({
         ).find(Boolean);
       }),
       clear = (D: any) => {
+        inputEl.value.value = '';
         emit('update:value', '');
         emit('clear', D);
         inputEl.value?.focus();
@@ -361,13 +381,25 @@ export default defineComponent({
             <span onClick={clear} class={[bem('suffix-icon'), bem('clear')]}>
               <Icon
                 name={
-                  '<svg xmlns="http://www.w3.org/2000/svg" width="1em" height="1em" fill="currentColor" viewBox="0 0 30 30">\n' +
+                  '<svg xmlns="http://www.w3.org/2000/svg"  width="1em" height="1em" viewBox="0 0 30 30" fill="currentColor" class="">\n' +
                   '  <g id="5c32be7db9d04da7291cf2c0956b8814-comm_icon_qc" transform="translate(19859 11386)">\n' +
-                  '    <rect id="5c32be7db9d04da7291cf2c0956b8814-矩形_28770" data-name="矩形 28770" width="30" height="30" transform="translate(-19859 -11386)" fill="#fff" opacity="0"/>\n' +
-                  '    <path id="5c32be7db9d04da7291cf2c0956b8814-清空" d="M3323,1936a14,14,0,1,1,9.9-4.1A14,14,0,0,1,3323,1936Zm0-12.35h0l4.536,4.537a1.167,1.167,0,1,0,1.65-1.65l-4.537-4.536,4.537-4.537a1.167,1.167,0,1,0-1.65-1.65l-4.536,4.536-4.538-4.536a1.167,1.167,0,0,0-1.65,1.651l4.538,4.536-4.538,4.537a1.167,1.167,0,1,0,1.65,1.65l4.537-4.537Z" transform="translate(-23167 -13292.998)" fill="#999"/>\n' +
+                  '    <rect id="5c32be7db9d04da7291cf2c0956b8814-矩形_28770" data-name="矩形 28770" width="30" height="30" transform="translate(-19859 -11386)" opacity="0"></rect>\n' +
+                  '    <path id="5c32be7db9d04da7291cf2c0956b8814-清空" d="M3323,1936a14,14,0,1,1,9.9-4.1A14,14,0,0,1,3323,1936Zm0-12.35h0l4.536,4.537a1.167,1.167,0,1,0,1.65-1.65l-4.537-4.536,4.537-4.537a1.167,1.167,0,1,0-1.65-1.65l-4.536,4.536-4.538-4.536a1.167,1.167,0,0,0-1.65,1.651l4.538,4.536-4.538,4.537a1.167,1.167,0,1,0,1.65,1.65l4.537-4.537Z" transform="translate(-23167 -13292.998)"></path>\n' +
                   '  </g>\n' +
-                  '<script xmlns=""/></svg>'
+                  '\n' +
+                  '</svg>'
                 }
+              />
+            </span>
+          )}
+          {showVerified.value && (
+            <span class={[bem('suffix-icon'), bem('clear')]}>
+              <Icon
+                name={`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="1em" height="1em" fill="currentColor">
+                        <circle cx="24" cy="24" r="21" fill="currentColor"/>
+                        <path d="M14.5 24.5l6.2 6.4L33.5 17.8" fill="none" stroke="#fff" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                       </svg>`}
+                color={'var(--van-success-color)'}
               />
             </span>
           )}
