@@ -235,7 +235,7 @@ export default defineComponent({
     const { parent } = useParent<any>(FORM_KEY);
 
     const o = ref(!1),
-      a = ref(),
+      ui = ref(),
       r = ref(),
       s = ref(''),
       i = ref(),
@@ -419,7 +419,7 @@ export default defineComponent({
         Re = A();
       return (
         <div
-          ref={a}
+          ref={ui}
           class={[
             bem('reference', {
               [props.size]: props.size,
@@ -485,11 +485,8 @@ export default defineComponent({
       watch(
         o,
         (z) => {
-          let ee;
           if (z) {
-            const ae = Math.ceil(
-              (ee = a.value) == null ? void 0 : ee.offsetWidth,
-            );
+            const ae = Math.ceil(ui.value?.offsetWidth);
             u.value !== ae && !Number.isNaN(ae) && (u.value = ae);
           } else emit('close');
         },
@@ -522,7 +519,7 @@ export default defineComponent({
     const ue = () => {
       o.value = !0;
     };
-    (useClickAway([a, l], () => {
+    (useClickAway([ui, l], () => {
       C || Z(!0);
     }),
       watch(

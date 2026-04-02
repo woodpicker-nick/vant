@@ -6,6 +6,7 @@
   --van-field-input-text-color: var(--van-text-color);
   --van-field-eye-show-color: var(--van-primary-color);
   --van-field-placeholder-color: var(--van-primary-color);
+  --van-field-error-border-color: var(--van-danger-color);
 }
 
 .van-field {
@@ -20,6 +21,15 @@
   color: var(--van-field-color);
   font-size: 0.22rem;
   padding: 0 0.2rem;
+  &:has(.van-field__prefix .van-select__reference) {
+    padding: 0 .2rem 0 0;
+  }
+  .van-field__prefix .van-form-item--style {
+    margin-bottom: 0;
+  }
+  .van-field__prefix .van-select__reference {
+    border: none;
+  }
 }
 
 .van-field {
@@ -31,6 +41,10 @@
 
 .van-field input[type='number'] {
   -moz-appearance: textfield;
+}
+
+.van-field--error {
+  border-color: var(--van-field-error-border-color) !important;
 }
 
 .van-field--disabled {
@@ -105,6 +119,13 @@
 
 .van-field__prefix {
   padding-right: 0.1rem;
+}
+
+.prefix__has_divider {
+  padding-right: 0;
+  .van-select-single {
+    padding-right: 0;
+  }
 }
 
 [dir='rtl'] .van-field__prefix {

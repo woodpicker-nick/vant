@@ -58,6 +58,7 @@ export const fieldProps = extend({}, fieldSharedProps, {
     default: !1,
   },
   clearable: Boolean,
+  keepError: Boolean,
   prefixIcon: String,
   suffixIcon: String,
   prefixStyle: Object,
@@ -186,8 +187,14 @@ export default defineComponent({
       parent?.onInitValue?.(props.value);
     });
     const isRequired = computed(() => parent?.required.value || props.required);
+    const noError = computed(() => {
+      if(props.keepError) {
+        return parent?.valid.value
+      }
+      return true;
+    });
     const showClear = computed(() => {
-      return props.clearable && !!props.value && isInput.value;
+      return props.clearable && !!props.value && (isInput.value || !noError.value);
     });
     const showVerified = computed(() => {
       return (
@@ -215,7 +222,7 @@ export default defineComponent({
         setTimeout(() => {
           isInput.value = false;
           isBlur.value = true;
-        }, 300);
+        }, 50);
       },
       onFocus = (D: any) => {
         (u && clearTimeout(u),
@@ -332,6 +339,7 @@ export default defineComponent({
           bem({
             textarea: props.type === 'textarea',
             disabled: props.disabled,
+            error: !noError.value
           }),
           props.class,
           isInput.value ? 'input-focus' : '',
@@ -341,12 +349,13 @@ export default defineComponent({
         {(slots.prefix || props.prefixIcon) && (
           <span
             style={props.prefixStyle}
-            class={
+            class={[
+              bem('prefix'),
               props.divider &&
               (props.divider === 'all' || props.divider === 'prefix')
                 ? 'prefix__has_divider'
-                : bem('prefix')
-            }
+                : ''
+            ]}
             onClick={() => emit('clickPrefix')}
           >
             {slots.prefix ? (
