@@ -119,7 +119,7 @@ export default defineComponent({
       } = useField(props.name as string, rules, {
         validateOnMount: false,
         validateOnValueUpdate: props.validateOnValueUpdate,
-        //format: props.format,
+        format: props.format,
         initialValue: props.initialValue,
       });
     watch(
@@ -160,7 +160,7 @@ export default defineComponent({
       onChildBlur: (h: any) => triggerFun(h, 'onBlur'),
       onInitValue: (h: any) => triggerFun(h),
       format: props.format,
-      valid: computed(() => meta.valid.value)
+      valid: computed(() => meta.valid.value),
     });
     useExpose({
       validate: validate,

@@ -21,7 +21,7 @@ export const formProps = {
   },
   model: {
     type: Object as PropType<Record<string, any>>,
-    required: true
+    required: true,
   },
   scrollToError: Boolean,
 };
@@ -52,16 +52,20 @@ export default defineComponent({
       setValues,
       resetForm,
       errors,
+      dirtyMap,
       handleSubmit,
       validateField,
       clearErrors,
     } = useForm({
       initialValues: props.model as Record<string, any>,
-      validateOnMount: false
+      validateOnMount: false,
     });
 
     const onSubmit = () => {
-      emit('submit', values);
+      const dirties = Object.entries(dirtyMap)
+        .filter(([, value]) => value)
+        .map(([key]) => key);
+      emit('submit', values, dirties, errors);
     };
 
     linkChildren({ props });
