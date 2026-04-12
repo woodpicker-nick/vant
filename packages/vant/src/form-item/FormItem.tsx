@@ -11,9 +11,10 @@ import { FORM_KEY, createNamespace } from '../utils';
 import { useParent, useChildren } from '@vant/use';
 import type { FormProvide } from '../form/types';
 import { useFieldExplain } from '../composables/use-field-explain';
-import { type FieldFormat, useField } from '../composables/use-field';
+import { useField } from '../composables/use-field';
 import { useExpose } from '../composables/use-expose';
 import Icon from '../icon';
+import { type FieldFormat } from "../composables/use-form";
 
 const [name, bem] = createNamespace('form-item');
 
@@ -82,6 +83,7 @@ export const formItemProps = {
   initialValue: {
     type: Object as PropType<any>,
   },
+  exclude: Boolean
 };
 
 export type FormItemProps = ExtractPropTypes<typeof formItemProps>;
@@ -121,6 +123,7 @@ export default defineComponent({
         validateOnValueUpdate: props.validateOnValueUpdate,
         format: props.format,
         initialValue: props.initialValue,
+        exclude: props.exclude
       });
     watch(
       () => value.value,

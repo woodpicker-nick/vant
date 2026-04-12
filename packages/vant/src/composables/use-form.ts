@@ -13,7 +13,29 @@ import {
 } from 'vue';
 import Schema from 'async-validator';
 
+
+export type FieldFormat<T> =
+  | ((value: T) => T)
+  | {
+  pattern: RegExp;
+  replace: string;
+};
+
 export type FieldRules = any[] | Record<string, any> | undefined;
+
+export function applyFormat<T>(value: T, format?: FieldFormat<T>): T {
+  if (!format) return value;
+
+  if (typeof format === 'function') {
+    return format(value);
+  }
+
+  if (typeof value === 'string') {
+    return value.replace(format.pattern, format.replace) as T;
+  }
+
+  return value;
+}
 
 export type ValidateResult = {
   valid: boolean;
@@ -56,7 +78,7 @@ export type FormContext<T extends Record<string, any>> = {
 
   setErrors: (errors: Partial<Record<keyof T & string, string>>) => void;
   setFieldError: <K extends keyof T & string>(name: K, message?: string) => void;
-  setFieldValue: <K extends keyof T & string>(name: K, value: T[K]) => void;
+  setFieldValue: <K extends keyof T & string>(name: K, value: T[K], initValue: T[K], format?: any) => void;
   setValues: (values: Partial<T>) => void;
   setFieldTouched: <K extends keyof T & string>(name: K, touched?: boolean) => void;
 
@@ -147,9 +169,10 @@ export function useForm<T extends Record<string, any>>(
     errors[name] = message;
   }
 
-  function setFieldValue<K extends keyof T & string>(name: K, value: T[K]) {
+  function setFieldValue<K extends keyof T & string>(name: K, value: T[K], initValue: T[K], format?: any) {
     values[name] = value;
-    dirtyMap[name] = value !== initialValuesRef.value[name];
+    const formattedValue = format ? applyFormat(initialValuesRef.value[name], format) : initialValuesRef.value[name];
+    dirtyMap[name] = value !== formattedValue && initValue !== formattedValue;
   }
 
   function setValues(newValues: Partial<T>) {

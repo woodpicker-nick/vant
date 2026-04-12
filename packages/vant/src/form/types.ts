@@ -1,6 +1,5 @@
-import type { ComponentPublicInstance, ComputedRef } from 'vue';
+import type { ComponentPublicInstance } from 'vue';
 import type { FormProps } from './Form';
-import type { FieldValidationStatus } from '../field';
 
 export type FormExpose = {
   submit: () => void;
@@ -8,7 +7,7 @@ export type FormExpose = {
   validateField: (name?: any) => Promise<any>;
   resetForm: () => void;
   setErrors: (fields: any) => void;
-  setFieldValue: (name?: any, shouldValidate?:boolean) => void;
+  setFieldValue: (name?: any, value?: any, initValue?: any) => void;
   setValues: (fields: any) => void;
   errors: Record<string, string>;
   clearErrors: () => void;

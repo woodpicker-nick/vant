@@ -28,8 +28,6 @@ import { icons } from './icon';
 
 import { useClipboard } from '../composables/use-clipboard';
 
-import { applyFormat } from '../composables/use-field';
-
 const [name, bem] = createNamespace('field');
 
 type DividerTypes = 'all' | 'prefix' | 'suffix';
@@ -144,12 +142,10 @@ export default defineComponent({
           };
         }
       }
+      if (props.trim) {
+        value = value.replace(' ', '');
+      }
       if (value !== props.value) {
-        if (parent?.format) {
-          value = applyFormat(value, parent?.format);
-        } else if (props.trim) {
-          value = value.replace(' ', '');
-        }
         emit('update:value', value);
         nextTick(() => {
           emit('change', value);

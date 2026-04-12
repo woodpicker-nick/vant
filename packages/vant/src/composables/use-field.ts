@@ -6,14 +6,7 @@ import {
   type ComputedRef,
   type WritableComputedRef,
 } from 'vue';
-import { useFormContext, type FieldRules, type FieldValidateResult } from './use-form';
-
-export type FieldFormat<T> =
-  | ((value: T) => T)
-  | {
-  pattern: RegExp;
-  replace: string;
-};
+import { useFormContext, applyFormat, type FieldRules, type FieldValidateResult, type FieldFormat } from './use-form';
 
 export type UseFieldOptions<T> = {
   validateOnValueUpdate?: boolean;
@@ -21,6 +14,7 @@ export type UseFieldOptions<T> = {
   initialValue?: T;
   keepValueOnUnmount?: boolean;
   format?: FieldFormat<T>;
+  exclude?: boolean;
 };
 
 export type FieldMeta = {
@@ -53,40 +47,27 @@ function isInputEvent(value: unknown): value is Event {
   return typeof Event !== 'undefined' && value instanceof Event;
 }
 
-export function applyFormat<T>(value: T, format?: FieldFormat<T>): T {
-  if (!format) return value;
-
-  if (typeof format === 'function') {
-    return format(value);
-  }
-
-  if (typeof value === 'string') {
-    return value.replace(format.pattern, format.replace) as T;
-  }
-
-  return value;
-}
-
 export function useField<T = any>(
   name: string,
   rules?: ComputedRef<FieldRules>,
   options: UseFieldOptions<T> = {},
 ): UseFieldReturn<T> {
-  const {
+  let {
     validateOnValueUpdate = false,
     validateOnMount = false,
     initialValue,
     keepValueOnUnmount = true,
     format,
+    exclude = false,
   } = options;
 
   const form = useFormContext<Record<string, any>>();
 
   form.registerField(name, rules?.value);
 
-  if (initialValue !== undefined && form.values[name] === undefined) {
+  if (initialValue !== undefined && form.values[name] === undefined && !exclude) {
     const formattedInitialValue = applyFormat(initialValue, format);
-    form.setFieldValue(name as never, formattedInitialValue as never);
+    form.setFieldValue(name as never, formattedInitialValue as never, initialValue as never, format);
   }
 
   watch(
@@ -108,8 +89,8 @@ export function useField<T = any>(
   onBeforeUnmount(() => {
     form.unregisterField(name as never);
 
-    if (!keepValueOnUnmount) {
-      form.setFieldValue(name as never, undefined as never);
+    if (!keepValueOnUnmount && !exclude) {
+      form.setFieldValue(name as never, undefined as never, undefined as never);
     }
   });
 
@@ -118,11 +99,13 @@ export function useField<T = any>(
       return form.values[name] as T;
     },
     set(newValue) {
-      const formattedValue = applyFormat(newValue, format);
-      form.setFieldValue(name as never, formattedValue as never);
+      if(!exclude) {
+        const formattedValue = applyFormat(newValue, format);
+        form.setFieldValue(name as never, formattedValue as never, newValue as never, format);
 
-      if (validateOnValueUpdate) {
-        void form.validateField(name as never);
+        if (validateOnValueUpdate) {
+          void form.validateField(name as never);
+        }
       }
     },
   });
@@ -144,11 +127,13 @@ export function useField<T = any>(
   }
 
   function setValue(newValue: T, shouldValidate = false) {
-    const formattedValue = applyFormat(newValue, format);
-    form.setFieldValue(name as never, formattedValue as never);
+    if(!exclude) {
+      const formattedValue = applyFormat(newValue, format);
+      form.setFieldValue(name as never, formattedValue as never, newValue as never, format);
 
-    if (shouldValidate) {
-      void form.validateField(name as never);
+      if (shouldValidate) {
+        void form.validateField(name as never);
+      }
     }
   }
 
@@ -183,10 +168,11 @@ export function useField<T = any>(
       state?.value !== undefined
         ? state.value
         : (form.initialValues.value[name] as T);
+    if(!exclude) {
+      const nextValue = applyFormat(rawValue, format);
 
-    const nextValue = applyFormat(rawValue, format);
-
-    form.setFieldValue(name as never, nextValue as never);
+      form.setFieldValue(name as never, nextValue as never, rawValue as never, format);
+    }
     form.setFieldTouched(name as never, state?.touched ?? false);
 
     if (state?.errors) {
@@ -219,9 +205,10 @@ export function useField<T = any>(
     } else {
       nextValue = e;
     }
-
-    const formattedValue = applyFormat(nextValue, format);
-    form.setFieldValue(name as never, formattedValue as never);
+    if(!exclude) {
+      const formattedValue = applyFormat(nextValue, format);
+      form.setFieldValue(name as never, formattedValue as never, nextValue as never, format);
+    }
 
     if (shouldValidate) {
       void form.validateField(name as never);
@@ -241,6 +228,6 @@ export function useField<T = any>(
     setRules,
     resetField,
     handleBlur,
-    handleChange,
+    handleChange
   };
 }
