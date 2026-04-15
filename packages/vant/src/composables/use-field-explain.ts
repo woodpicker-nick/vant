@@ -1,4 +1,4 @@
-import { computed, getCurrentInstance, inject, InjectionKey } from 'vue';
+import { computed, InjectionKey } from 'vue';
 import { useInjection } from './use-injection';
 
 export const FORM_FIELD_EXPLAIN_KEY: InjectionKey<any> = Symbol(
@@ -8,22 +8,12 @@ export const FORM_FIELD_EXPLAIN_KEY: InjectionKey<any> = Symbol(
 export function useFieldExplain(e: any) {
   const props = useInjection(FORM_FIELD_EXPLAIN_KEY);
   return computed(() => {
-    let n, s, o;
     return {
-      setFieldWarn: props == null ? void 0 : props.setFieldWarn,
-      setFieldError: props == null ? void 0 : props.setFieldError,
-      setFieldSuccess: props == null ? void 0 : props.setFieldSuccess,
-      message:
-        (n = props == null ? void 0 : props.message.value[e]) == null
-          ? void 0
-          : n.message,
-      type:
-        (o =
-          (s = props == null ? void 0 : props.message.value[e]) == null
-            ? void 0
-            : s.type) != null
-          ? o
-          : 'success',
+      setFieldWarn: props?.setFieldWarn,
+      setFieldError: props?.setFieldError,
+      setFieldSuccess: props?.setFieldSuccess,
+      message: props?.message?.value?.[e]?.message,
+      type: props?.message?.value?.[e]?.type || 'success',
     };
   });
 }

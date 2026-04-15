@@ -10,6 +10,7 @@ export type FormExpose = {
   setFieldValue: (name?: any, value?: any, initValue?: any) => void;
   setValues: (fields: any) => void;
   errors: Record<string, string>;
+  getDirties: () => Record<string, any>;
   clearErrors: () => void;
   // getValues: () => Record<string, unknown>;
   // scrollToField: (

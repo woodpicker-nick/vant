@@ -1,4 +1,4 @@
-import { defineComponent, type ExtractPropTypes, type PropType } from 'vue';
+import { defineComponent, type ExtractPropTypes, type PropType, ref } from 'vue';
 
 // Utils
 import { FORM_KEY, createNamespace } from '../utils';
@@ -33,10 +33,12 @@ export default defineComponent({
 
   props: formProps,
 
-  emits: ['submit'],
+  emits: ['submit', 'hasError'],
 
   setup(props, { emit, slots }) {
     const { linkChildren } = useChildren<any>(FORM_KEY);
+
+    const renderKey = ref(0);
 
     linkChildren({
       layout: props.layout,
@@ -50,7 +52,7 @@ export default defineComponent({
       setErrors,
       setFieldValue,
       setValues,
-      resetForm,
+      resetForm: g,
       errors,
       dirtyMap,
       handleSubmit,
@@ -61,11 +63,27 @@ export default defineComponent({
       validateOnMount: false,
     });
 
-    const onSubmit = () => {
+    const getDirties = () => {
+      const o = {} as Record<string, any>;
       const dirties = Object.entries(dirtyMap)
         .filter(([, value]) => value)
         .map(([key]) => key);
+      if(dirties.length > 0) {
+        dirties.forEach(dir => {
+          o[dir] = values[dir];
+        })
+      }
+      return o;
+    }
+
+    const onSubmit = () => {
+      const dirties = getDirties();
       emit('submit', values, dirties, errors);
+    };
+
+    const resetForm = () => {
+      g();
+      renderKey.value++;
     };
 
     linkChildren({ props });
@@ -77,11 +95,15 @@ export default defineComponent({
       setFieldValue,
       setValues,
       errors,
+      getDirties,
       clearErrors,
       submit: async () => {
         await validate();
-        if (meta.valid.value) onSubmit();
+        if (meta.valid.value) {
+          onSubmit();
+        }
         else if (props.scrollToError) {
+          emit("hasError");
           const el = document.querySelector(
             '.van-form-item__explain[data-formitem-error="true"]',
           );
@@ -91,12 +113,14 @@ export default defineComponent({
               block: 'center',
               inline: 'nearest',
             });
+        } else {
+          emit("hasError");
         }
       },
     });
 
     return () => (
-      <form class={bem()} novalidate={true} onSubmit={handleSubmit(onSubmit)}>
+      <form key={`van-form-${renderKey.value}`} class={bem()} novalidate={true} onSubmit={handleSubmit(onSubmit)}>
         {slots.default?.()}
       </form>
     );

@@ -28,6 +28,9 @@ export const formItemProps = {
     type: String,
     required: true,
   },
+  dynamicName: {  //动态 form item name. 如果传递了此值，表单会忽略name, 并将此值应用到form表单中。
+    type: String
+  },
   label: [Function, String],
   validateTrigger: {
     type: [String, Array],
@@ -112,13 +115,14 @@ export default defineComponent({
       }),
       d = useFieldExplain(props.name),
       rules = computed(() => props.rules),
+      dynamicName = computed(() => props.dynamicName || props.name as never),
       {
         value,
         validate,
         errorMessage,
         meta,
-        resetField: g,
-      } = useField(props.name as string, rules, {
+        resetField
+      } = useField(dynamicName, rules, {
         validateOnMount: false,
         validateOnValueUpdate: props.validateOnValueUpdate,
         format: props.format,
@@ -168,7 +172,7 @@ export default defineComponent({
     useExpose({
       validate: validate,
       meta,
-      clearValidate: g,
+      clearValidate: resetField,
     });
     const message = (h: any, R: boolean, P: any) => {
         const O = i.icons || {},

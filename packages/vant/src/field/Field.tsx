@@ -27,6 +27,8 @@ import { Divider } from '../divider';
 import { icons } from './icon';
 
 import { useClipboard } from '../composables/use-clipboard';
+import type { FieldFormat } from "../composables/use-form";
+import { applyFormat } from '../composables/use-form';
 
 const [name, bem] = createNamespace('field');
 
@@ -80,6 +82,9 @@ export const fieldProps = extend({}, fieldSharedProps, {
   eyeCloseIcon: String,
   verify: Boolean,
   trim: Boolean,
+  secrecy: {
+    type: Object as PropType<FieldFormat<any>>, //开启隐私模式， 隐私模式下初始值会使用此字段加密展示。
+  },
 });
 
 export type FieldProps = ExtractPropTypes<typeof fieldProps>;
@@ -105,6 +110,11 @@ export default defineComponent({
     const { parent } = useParent<any>(FORM_KEY);
     const isBlur = ref(false);
     const oldValue = ref('');
+    const initValue = ref({
+      secrecyValue: '',
+      value: ''
+    });
+    const complete = ref(false);
     const isInput = ref(false),
       i = ref(false),
       inputPosition = shallowRef<any>({
@@ -112,11 +122,11 @@ export default defineComponent({
         valueLength: undefined,
       }),
       inputEl = ref<any>(null);
-    const u: any = null;
+    //const u: any = null;
     const getInputValue = () => {
       return inputEl.value?.value;
     };
-    const isStop = ref(false);
+    //const isStop = ref(false);
     const resetSelection = (D = '') => {
       let W, ee;
       if (!inputEl.value) return;
@@ -145,41 +155,61 @@ export default defineComponent({
       if (props.trim) {
         value = value.replace(' ', '');
       }
-      if (value !== props.value) {
-        emit('update:value', value);
-        nextTick(() => {
-          emit('change', value);
-          isStop.value && parent?.onChildChange?.(props.value);
-          isStop.value = true;
+      if(props.secrecy){
+        const secrecyValue = applyFormat(props.value, props.secrecy);
+        if(value === secrecyValue) {
           if (inputEl.value) {
-            const oldValue = props.value ? String(props.value) : '';
-            if (inputEl.value.value !== oldValue) {
-              inputEl.value.value = oldValue;
-              resetSelection(inputEl.value.value);
-            }
+            inputEl.value.value = value;
+            resetSelection(inputEl.value.value);
+            complete.value = true;
           }
-        });
+        } else {
+          afterChangeValue(value);
+        }
+      } else if (value !== props.value) {
+        afterChangeValue(value);
       } else {
-        isStop.value = true;
+        //isStop.value = true;
       }
     };
-    const initValue = () => {
+    const afterChangeValue = (value: any) => {
+      emit('update:value', value);
+      nextTick(() => {
+        emit('change', value);
+        parent?.onChildChange?.(props.value);
+        //isStop.value = true;
+        complete.value = false;
+        if (inputEl.value) {
+          const oldValue = props.value ? String(props.value) : '';
+          if (inputEl.value.value !== oldValue) {
+            inputEl.value.value = oldValue;
+            resetSelection(inputEl.value.value);
+          }
+        }
+      });
+    }
+    const initValueFn = () => {
       if(isNotNull(props.value)) {
+        initValue.value = {
+          secrecyValue: props.secrecy ? applyFormat(String(props.value), props.secrecy) : String(props.value),
+          value: String(props.value)
+        };
         oldValue.value = String(props.value);
       }
-      changeValue(oldValue.value, 'parent');
+      changeValue(initValue.value.secrecyValue, 'parent');
     };
     watch(
       () => props.value,
       (D) => {
         if (D !== getInputValue()) {
-          initValue();
+          oldValue.value = String(props.value);
+          changeValue(oldValue.value, 'parent');
           parent?.onChildChange?.(props.value);
         }
       },
     );
     onMounted(() => {
-      initValue();
+      initValueFn();
       parent?.onInitValue?.(props.value);
     });
     const isRequired = computed(() => parent?.required.value || props.required);
@@ -212,19 +242,32 @@ export default defineComponent({
           ((visiblePassword.value = !visiblePassword.value),
           emit('update:visiblePassword', visiblePassword.value));
       },
-      onBlur = (D: any) => {
-        emit('blur', D);
+      onBlur = (event: any) => {
+        emit('blur', event);
         parent?.onChildBlur?.(props.value);
         setTimeout(() => {
           isInput.value = false;
           isBlur.value = true;
+          if(props.secrecy) {
+            //const currentValue = applyFormat(event.target.value, props.secrecy);
+            if(event.target.value === initValue.value.value) {
+              event.target.value = initValue.value.secrecyValue;
+              complete.value = true;
+            }
+          }
         }, 50);
       },
-      onFocus = (D: any) => {
-        (u && clearTimeout(u),
-          emit('focus', D),
-          (isInput.value = true),
-          (isBlur.value = false));
+      onFocus = (event: any) => {
+        if(props.secrecy) {
+          //const currentValue = applyFormat(el.value, props.secrecy);
+          if(event.target.value === initValue.value.secrecyValue) {
+            event.target.value = initValue.value.value;
+          }
+          complete.value = false;
+        }
+        emit('focus', event);
+        isInput.value = true;
+        isBlur.value = false;
       },
       onInput = () => {
         if (!isInput.value) isInput.value = true;
@@ -335,7 +378,8 @@ export default defineComponent({
           bem({
             textarea: props.type === 'textarea',
             disabled: props.disabled,
-            error: !noError.value
+            error: !noError.value,
+            complete: complete.value
           }),
           props.class,
           isInput.value ? 'input-focus' : '',

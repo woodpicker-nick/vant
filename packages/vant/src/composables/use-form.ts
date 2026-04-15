@@ -172,7 +172,7 @@ export function useForm<T extends Record<string, any>>(
   function setFieldValue<K extends keyof T & string>(name: K, value: T[K], initValue: T[K], format?: any) {
     values[name] = value;
     const formattedValue = format ? applyFormat(initialValuesRef.value[name], format) : initialValuesRef.value[name];
-    dirtyMap[name] = value !== formattedValue && initValue !== formattedValue;
+    dirtyMap[name] = ((value === '' && !!initialValuesRef.value[name]) || value !== '') && value !== formattedValue && initValue !== formattedValue;
   }
 
   function setValues(newValues: Partial<T>) {
