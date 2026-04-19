@@ -78,7 +78,7 @@ export default defineComponent({
 
     const onSubmit = () => {
       const dirties = getDirties();
-      emit('submit', values, dirties, errors);
+      emit('submit', values, dirties);
     };
 
     const resetForm = () => {

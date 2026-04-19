@@ -107,7 +107,7 @@ export default defineComponent({
           ? props.validateTrigger
           : [props.validateTrigger]
         ).includes(h),
-      l = computed(() => {
+      layout = computed(() => {
         return parent?.layout || props.layout;
       }),
       u = computed(() => {
@@ -215,7 +215,7 @@ export default defineComponent({
         class={bem({
           [props.name as string]: !0,
           style: !props.noStyle,
-          horizontal: l.value === 'horizontal',
+          horizontal: layout.value === 'horizontal',
           required: required.value,
           'has-error': _.value,
         })}
@@ -225,7 +225,7 @@ export default defineComponent({
           <span
             class={bem('label')}
             style={{
-              width: l.value === 'horizontal' ? u.value : 'auto',
+              width: layout.value === 'horizontal' ? u.value : 'auto',
             }}
           >
             {required.value && props.showRequired && (

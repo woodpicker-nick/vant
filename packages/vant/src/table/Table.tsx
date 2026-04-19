@@ -21,10 +21,6 @@ export const tableProps = {
   uniqueKey: makeStringProp('id'),
   columns: makeRequiredProp(Array),
   data: makeRequiredProp(Array),
-  list: {
-    type: Object,
-    default: () => ({}),
-  },
   reverse: Boolean,
   rowClassName: {
     type: Function,

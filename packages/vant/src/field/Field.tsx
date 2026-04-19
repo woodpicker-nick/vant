@@ -48,14 +48,14 @@ export const fieldProps = extend({}, fieldSharedProps, {
   },
   showStarSign: {
     type: Boolean,
-    default: !0,
+    default: true,
   },
   required: Boolean,
   placeholder: String,
   disabled: Boolean,
   visiblePassword: {
     type: Boolean,
-    default: !1,
+    default: false,
   },
   clearable: Boolean,
   keepError: Boolean,
@@ -72,8 +72,6 @@ export const fieldProps = extend({}, fieldSharedProps, {
   },
   inputClass: [Array, String, Object],
   inputStyle: Object,
-  class: [Array, String, Object],
-  style: Object,
   showEye: {
     type: Boolean,
     default: (e: any) => e.type === 'password',
@@ -83,7 +81,7 @@ export const fieldProps = extend({}, fieldSharedProps, {
   verify: Boolean,
   trim: Boolean,
   secrecy: {
-    type: Object as PropType<FieldFormat<any>>, //开启隐私模式， 隐私模式下初始值会使用此字段加密展示。
+    type: Object as PropType<FieldFormat<any>>, //开启分离模式， 分离模式下初始值会使用此字段展示。
   },
 });
 
@@ -381,10 +379,8 @@ export default defineComponent({
             error: !noError.value,
             complete: complete.value
           }),
-          props.class,
           isInput.value ? 'input-focus' : '',
         ]}
-        style={props.style}
       >
         {(slots.prefix || props.prefixIcon) && (
           <span

@@ -11,35 +11,11 @@ import { SELECT_KEY } from "../select/Select";
 const [name, bem] = createNamespace('select-options');
 
 export const selectOptionsProps = {
-  placeholder: String,
-  labelRender: {
-    type: Function,
-    default: (e: any) => e.label,
-  },
-  fillMode: {
-    type: String,
-    default: 'lead',
-  },
-  readonly: {
-    type: Boolean,
-    default: !1,
-  },
-  useReadonlyStyle: {
-    type: Boolean,
-    default: !0,
-  },
-  option: {
-    type: Object,
-  },
   value: [Number, String, Boolean],
   label: String,
   icon: String,
   disabled: Boolean,
   data: Object as Record<string, any>,
-  mode: {
-    type: String,
-    default: 'single',
-  },
 };
 
 export type SelectOptionsProps = ExtractPropTypes<typeof selectOptionsProps>;
@@ -86,7 +62,7 @@ export default defineComponent({
       { slots.icon?.() }
       { props.icon && <Icon name={props.icon} class={bem("icon")}></Icon>}
       <span class={bem("option-content")}>
-        { slots.default?.() }
+        { slots.default?.() || props.label }
       </span>
       { slots.rightIcon?.()}
     </div>;

@@ -11,11 +11,11 @@ import {
   numericProp,
   makeArrayProp,
   makeStringProp,
-  createNamespace,
-} from '../utils';
+  createNamespace, FORM_KEY,
+} from "../utils";
 
 // Composables
-import { useChildren, useCustomFieldValue } from '@vant/use';
+import { useChildren, useCustomFieldValue, useParent } from "@vant/use";
 import { useExpose } from '../composables/use-expose';
 
 // Types
@@ -51,9 +51,13 @@ export default defineComponent({
   emits: ['change', 'update:modelValue'],
 
   setup(props, { emit, slots }) {
+    const { parent } = useParent<any>(FORM_KEY);
     const { children, linkChildren } = useChildren(CHECKBOX_GROUP_KEY);
 
-    const updateValue = (value: unknown[]) => emit('update:modelValue', value);
+    const updateValue = (value: unknown[]) => {
+      emit('update:modelValue', value);
+      parent?.onChildChange?.(value);
+    }
 
     const toggleAll = (options: CheckboxGroupToggleAllOptions = {}) => {
       if (typeof options === 'boolean') {

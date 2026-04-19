@@ -101,19 +101,14 @@ export const selectProps = {
     default: 'middle',
   },
   round: Boolean,
-  class: String,
   dropdownClassName: String,
   optionActiveClass: String,
-  displayedOptions: Array,
   filterKey: String,
   wrapperClass: unknownProp,
   popoverClass: unknownProp,
   labelRender: {
     type: Function,
     default: (e: any) => e.label,
-  },
-  renderNotFount: {
-    type: Function,
   },
   placeholder: {
     type: String,
@@ -122,16 +117,9 @@ export const selectProps = {
   zIndex: {
     type: [Number, String],
   },
-  autoFlip: {
-    type: Boolean,
-    default: !0,
-  },
   autoWidth: {
     type: Boolean,
-    default: !1,
-  },
-  minWidth: {
-    type: String,
+    default: false,
   },
   fields: {
     type: Object,
@@ -139,37 +127,23 @@ export const selectProps = {
   },
   allowClear: {
     type: Boolean,
-    default: !1,
-  },
-  isDisabled: {
-    type: Boolean,
-    default: !1,
+    default: false,
   },
   showSearch: {
     type: Boolean,
-    default: !1,
+    default: false,
   },
   searchCaseSensitive: {
     type: Boolean,
-    default: !0,
+    default: true,
   },
   showArrow: {
     type: Boolean,
-    default: !0,
+    default: true,
   },
   mode: {
     type: String,
     default: 'single',
-  },
-  notFoundContent: {
-    type: Boolean,
-    default: !0,
-  },
-  suffixIcon: {
-    type: Function,
-  },
-  arrowIcon: {
-    type: String,
   },
   fillMode: {
     type: String,
@@ -179,15 +153,15 @@ export const selectProps = {
   required: Boolean,
   readonly: {
     type: Boolean,
-    default: !1,
+    default: false,
   },
   useReadonlyStyle: {
     type: Boolean,
-    default: !0,
+    default: true,
   },
   isSearchingTriggerValueChange: {
     type: Boolean,
-    default: !1,
+    default: false,
   },
   arrowPosition: {
     type: String,
@@ -256,17 +230,10 @@ export default defineComponent({
 
     let C = !1;
     const A = () => _.value && !f.value,
-      O = computed(() => {
-        var z, ee;
-        return (
-          !!((ee =
-            (z = parent == null ? void 0 : parent.required) == null ? void 0 : z.value) !=
-          null
-            ? ee
-            : props.required) && props.showStarSign
-        );
+      showStarSign = computed(() => {
+        return (parent?.required?.value != null || props.required) && props.showStarSign;
       });
-    provide(Symbol('show-star-sign'), O);
+    provide(Symbol('show-star-sign'), showStarSign);
 
     const k = (z: any) => {
         const ee = props.labelRender({
@@ -598,7 +565,6 @@ export default defineComponent({
           style={Y}
           v-model:show={o.value}
           offset={props.offset}
-          autoFlip={props.autoFlip}
           readonly={props.readonly}
           v-slots={{
             reference: () => $(),

@@ -31,10 +31,6 @@ import { useExpose } from "../composables/use-expose";
 const [name, bem] = createNamespace('scroll');
 
 export const scrollProps = {
-  bindRoute: {
-    type: Boolean,
-    default: false,
-  },
   draggable: {
     type: Boolean,
     default: false,
@@ -95,7 +91,7 @@ export default defineComponent({
     const g = inject<any>(yN, ref({})),
       m = computed(() => browerUtil.isDesktop),
       p = computed(() => browerUtil.isFireFox),
-      _ = true,
+      bind = true,
       b = true,
       y = computed(() =>
         e.scrollbarTrigger === 'none' || w.value || b
@@ -334,7 +330,7 @@ export default defineComponent({
             },
           },
         ),
-        _
+        bind
           ? []
           : [
               [
