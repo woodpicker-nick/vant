@@ -1,0 +1,19 @@
+.autoShrinkText {
+  display: inline-block;
+  line-height: 0;
+  overflow: hidden;
+  &-child {
+    &-text {
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      display: -webkit-box;
+      line-height: 1.2;
+      overflow: hidden;
+      overflow: initial;
+      text-align: center;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+      word-break: break-word;
+    }
+  }
+}

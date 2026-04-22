@@ -1,6 +1,6 @@
 {
   "name": "@vant/use",
-  "version": "1.6.0",
+  "version": "1.6.0-1",
   "description": "Vant Composition API",
   "type": "module",
   "main": "dist/index.cjs",
@@ -23,16 +23,6 @@
     "release": "vant-cli release",
     "prepare": "pnpm build"
   },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/vant-ui/vant.git",
-    "directory": "packages/vant-use"
-  },
-  "bugs": "https://github.com/vant-ui/vant/issues",
   "author": "chenjiahan",
   "license": "MIT",
   "devDependencies": {
